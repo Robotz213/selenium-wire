@@ -46,6 +46,7 @@ setup(
         "selenium>=4.0.0",
         "wsproto>=0.14",
         "zstandard>=0.14.1",
+        "mitmproxy-rs>=0.12.11",
     ],
     extras_require={
         ':sys_platform == "win32"': [

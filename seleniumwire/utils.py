@@ -4,21 +4,21 @@ import os
 import pkgutil
 from collections import namedtuple
 from pathlib import Path
-from typing import Dict, NamedTuple
+from typing import NamedTuple
 from urllib.request import _parse_proxy
 
 from seleniumwire.thirdparty.mitmproxy.net.http import encoding as decoder
 
 log = logging.getLogger(__name__)
 
-ROOT_CERT = 'ca.crt'
-ROOT_KEY = 'ca.key'
-COMBINED_CERT = 'seleniumwire-ca.pem'
+ROOT_CERT = "ca.crt"
+ROOT_KEY = "ca.key"
+COMBINED_CERT = "seleniumwire-ca.pem"
 
-MITM_MODE = 'mode'
-MITM_UPSTREAM_AUTH = 'upstream_auth'
-MITM_UPSTREAM_CUSTOM_AUTH = 'upstream_custom_auth'
-MITM_NO_PROXY = 'no_proxy'
+MITM_MODE = "mode"
+MITM_UPSTREAM_AUTH = "upstream_auth"
+MITM_UPSTREAM_CUSTOM_AUTH = "upstream_custom_auth"
+MITM_NO_PROXY = "no_proxy"
 
 
 def get_upstream_proxy(options):
@@ -39,30 +39,30 @@ def get_upstream_proxy(options):
         options: The selenium wire options.
     Returns: A dictionary.
     """
-    proxy_options = (options or {}).pop('proxy', {})
+    proxy_options = (options or {}).pop("proxy", {})
 
-    http_proxy = os.environ.get('HTTP_PROXY')
-    https_proxy = os.environ.get('HTTPS_PROXY')
-    no_proxy = os.environ.get('NO_PROXY')
+    http_proxy = os.environ.get("HTTP_PROXY")
+    https_proxy = os.environ.get("HTTPS_PROXY")
+    no_proxy = os.environ.get("NO_PROXY")
 
     merged = {}
 
     if http_proxy:
-        merged['http'] = http_proxy
+        merged["http"] = http_proxy
     if https_proxy:
-        merged['https'] = https_proxy
+        merged["https"] = https_proxy
     if no_proxy:
-        merged['no_proxy'] = no_proxy
+        merged["no_proxy"] = no_proxy
 
     merged.update(proxy_options)
 
-    no_proxy = merged.get('no_proxy')
+    no_proxy = merged.get("no_proxy")
     if isinstance(no_proxy, str):
-        merged['no_proxy'] = [h.strip() for h in no_proxy.split(',')]
+        merged["no_proxy"] = [h.strip() for h in no_proxy.split(",")]
 
-    conf = namedtuple('ProxyConf', 'scheme username password hostport')
+    conf = namedtuple("ProxyConf", "scheme username password hostport")
 
-    for proxy_type in ('http', 'https'):
+    for proxy_type in ("http", "https"):
         # Parse the upstream proxy URL into (scheme, username, password, hostport)
         # for ease of access.
         if merged.get(proxy_type) is not None:
@@ -71,21 +71,23 @@ def get_upstream_proxy(options):
     return merged
 
 
-def build_proxy_args(proxy_config: Dict[str, NamedTuple]) -> Dict[str, str]:
+def build_proxy_args(proxy_config: dict[str, NamedTuple]) -> dict[str, str]:
     """Build the arguments needed to pass an upstream proxy to mitmproxy.
 
     Args:
         proxy_config: The proxy config parsed out of the Selenium Wire options.
     Returns: A dictionary of arguments suitable for passing to mitmproxy.
     """
-    http_proxy = proxy_config.get('http')
-    https_proxy = proxy_config.get('https')
+    http_proxy = proxy_config.get("http")
+    https_proxy = proxy_config.get("https")
     conf = None
 
     if http_proxy and https_proxy:
-        if http_proxy.hostport != https_proxy.hostport:  # noqa
+        if http_proxy.hostport != https_proxy.hostport:
             # We only support a single upstream proxy server
-            raise ValueError('Different settings for http and https proxy servers not supported')
+            raise ValueError(
+                "Different settings for http and https proxy servers not supported"
+            )
 
         conf = https_proxy
     elif http_proxy:
@@ -98,17 +100,17 @@ def build_proxy_args(proxy_config: Dict[str, NamedTuple]) -> Dict[str, str]:
     if conf:
         scheme, username, password, hostport = conf
 
-        args[MITM_MODE] = 'upstream:{}://{}'.format(scheme, hostport)
+        args[MITM_MODE] = f"upstream:{scheme}://{hostport}"
 
         if username:
-            args[MITM_UPSTREAM_AUTH] = '{}:{}'.format(username, password)
+            args[MITM_UPSTREAM_AUTH] = f"{username}:{password}"
 
-        custom_auth = proxy_config.get('custom_authorization')
+        custom_auth = proxy_config.get("custom_authorization")
 
         if custom_auth:
             args[MITM_UPSTREAM_CUSTOM_AUTH] = custom_auth
 
-        no_proxy = proxy_config.get('no_proxy')
+        no_proxy = proxy_config.get("no_proxy")
 
         if no_proxy:
             args[MITM_NO_PROXY] = no_proxy
@@ -116,17 +118,17 @@ def build_proxy_args(proxy_config: Dict[str, NamedTuple]) -> Dict[str, str]:
     return args
 
 
-def extract_cert(cert_name='ca.crt'):
+def extract_cert(cert_name="ca.crt"):
     """Extracts the root certificate to the current working directory."""
 
     try:
         cert = pkgutil.get_data(__package__, cert_name)
     except FileNotFoundError:
-        log.error("Invalid certificate '{}'".format(cert_name))
+        log.error(f"Invalid certificate '{cert_name}'")
     else:
-        with open(Path(os.getcwd(), cert_name), 'wb') as out:
+        with open(Path(os.getcwd(), cert_name), "wb") as out:
             out.write(cert)
-        log.info('{} extracted. You can now import this into a browser.'.format(cert_name))
+        log.info(f"{cert_name} extracted. You can now import this into a browser.")
 
 
 def extract_cert_and_key(dest_folder, cert_path=None, key_path=None, check_exists=True):
@@ -154,17 +156,19 @@ def extract_cert_and_key(dest_folder, cert_path=None, key_path=None, check_exist
         root_cert = Path(cert_path).read_bytes()
         root_key = Path(key_path).read_bytes()
     elif cert_path is not None or key_path is not None:
-        raise ValueError('A certificate and key must both be supplied')
+        raise ValueError("A certificate and key must both be supplied")
     else:
         root_cert = pkgutil.get_data(__package__, ROOT_CERT)
         root_key = pkgutil.get_data(__package__, ROOT_KEY)
 
-    with open(combined_path, 'wb') as f_out:
-        f_out.write(root_cert + b'\n' + root_key)
+    with open(combined_path, "wb") as f_out:
+        f_out.write(root_cert + b"\n" + root_key)
 
 
 def is_list_alike(container):
-    return isinstance(container, collections.abc.Sequence) and not isinstance(container, str)
+    return isinstance(container, collections.abc.Sequence) and not isinstance(
+        container, str
+    )
 
 
 def urlsafe_address(address):
@@ -179,7 +183,7 @@ def urlsafe_address(address):
 
     if rest:
         # An IPv6 address needs to be surrounded by square brackets
-        addr = f'[{addr}]'
+        addr = f"[{addr}]"
 
     return addr, port
 

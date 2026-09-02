@@ -2,10 +2,10 @@
 
 This code has been taken from the har_dump.py addon in the mitmproxy project.
 """
+
 import base64
 import json
 from datetime import datetime, timezone
-from typing import List, Set
 
 import seleniumwire
 from seleniumwire.thirdparty.mitmproxy import connections
@@ -15,7 +15,7 @@ from seleniumwire.thirdparty.mitmproxy.utils import strutils
 
 # A list of server seen till now is maintained so we can avoid
 # using 'connect' time for entries that use an existing connection.
-SERVERS_SEEN: Set[connections.ServerConnection] = set()
+SERVERS_SEEN: set[connections.ServerConnection] = set()
 
 
 def create_har_entry(flow: HTTPFlow) -> dict:
@@ -30,10 +30,15 @@ def create_har_entry(flow: HTTPFlow) -> dict:
     connect_time = -1
 
     if flow.server_conn and flow.server_conn not in SERVERS_SEEN:
-        connect_time = flow.server_conn.timestamp_tcp_setup - flow.server_conn.timestamp_start
+        connect_time = (
+            flow.server_conn.timestamp_tcp_setup - flow.server_conn.timestamp_start
+        )
 
         if flow.server_conn.timestamp_tls_setup is not None:
-            ssl_time = flow.server_conn.timestamp_tls_setup - flow.server_conn.timestamp_tcp_setup
+            ssl_time = (
+                flow.server_conn.timestamp_tls_setup
+                - flow.server_conn.timestamp_tcp_setup
+            )
 
         SERVERS_SEEN.add(flow.server_conn)
 
@@ -44,11 +49,11 @@ def create_har_entry(flow: HTTPFlow) -> dict:
     # spent waiting between request.timestamp_end and response.timestamp_start
     # thus it correlates to HAR wait instead.
     timings_raw = {
-        'send': flow.request.timestamp_end - flow.request.timestamp_start,
-        'receive': flow.response.timestamp_end - flow.response.timestamp_start,
-        'wait': flow.response.timestamp_start - flow.request.timestamp_end,
-        'connect': connect_time,
-        'ssl': ssl_time,
+        "send": flow.request.timestamp_end - flow.request.timestamp_start,
+        "receive": flow.response.timestamp_end - flow.response.timestamp_start,
+        "wait": flow.response.timestamp_start - flow.request.timestamp_end,
+        "connect": connect_time,
+        "ssl": ssl_time,
     }
 
     # HAR timings are integers in ms, so we re-encode the raw timings to that format.
@@ -58,11 +63,17 @@ def create_har_entry(flow: HTTPFlow) -> dict:
     # Timings set to -1 will be ignored as per spec.
     full_time = sum(v for v in timings.values() if v > -1)
 
-    started_date_time = datetime.fromtimestamp(flow.request.timestamp_start, timezone.utc).isoformat()
+    started_date_time = datetime.fromtimestamp(
+        flow.request.timestamp_start, timezone.utc
+    ).isoformat()
 
     # Response body size and encoding
-    response_body_size = len(flow.response.raw_content) if flow.response.raw_content else 0
-    response_body_decoded_size = len(flow.response.content) if flow.response.content else 0
+    response_body_size = (
+        len(flow.response.raw_content) if flow.response.raw_content else 0
+    )
+    response_body_decoded_size = (
+        len(flow.response.content) if flow.response.content else 0
+    )
     response_body_compression = response_body_decoded_size - response_body_size
 
     entry = {
@@ -87,9 +98,9 @@ def create_har_entry(flow: HTTPFlow) -> dict:
             "content": {
                 "size": response_body_size,
                 "compression": response_body_compression,
-                "mimeType": flow.response.headers.get('Content-Type', ''),
+                "mimeType": flow.response.headers.get("Content-Type", ""),
             },
-            "redirectURL": flow.response.headers.get('Location', ''),
+            "redirectURL": flow.response.headers.get("Location", ""),
             "headersSize": len(str(flow.response.headers)),
             "bodySize": response_body_size,
         },
@@ -99,13 +110,18 @@ def create_har_entry(flow: HTTPFlow) -> dict:
 
     # Store binary data as base64
     if strutils.is_mostly_bin(flow.response.content):
-        entry["response"]["content"]["text"] = base64.b64encode(flow.response.content).decode()
+        entry["response"]["content"]["text"] = base64.b64encode(
+            flow.response.content
+        ).decode()
         entry["response"]["content"]["encoding"] = "base64"
     else:
         entry["response"]["content"]["text"] = flow.response.get_text(strict=False)
 
     if flow.request.method in ["POST", "PUT", "PATCH"]:
-        params = [{"name": a, "value": b} for a, b in flow.request.urlencoded_form.items(multi=True)]
+        params = [
+            {"name": a, "value": b}
+            for a, b in flow.request.urlencoded_form.items(multi=True)
+        ]
         entry["request"]["postData"] = {
             "mimeType": flow.request.headers.get("Content-Type", ""),
             "text": flow.request.get_text(strict=False),
@@ -139,7 +155,9 @@ def _format_cookies(cookie_list):
         # Expiration time needs to be formatted
         expire_ts = cookies.get_expiration_ts(attrs)
         if expire_ts is not None:
-            cookie_har["expires"] = datetime.fromtimestamp(expire_ts, timezone.utc).isoformat()
+            cookie_har["expires"] = datetime.fromtimestamp(
+                expire_ts, timezone.utc
+            ).isoformat()
 
         rv.append(cookie_har)
 
@@ -161,7 +179,7 @@ def _name_value(obj):
     return [{"name": k, "value": v} for k, v in obj.items()]
 
 
-def generate_har(entries: List[dict]) -> str:
+def generate_har(entries: list[dict]) -> str:
     """Generate a HAR as a JSON formatted string.
 
     Args:

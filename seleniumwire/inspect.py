@@ -1,6 +1,6 @@
 import inspect
 import time
-from typing import Iterator, List, Optional, Union
+from collections.abc import Iterator
 
 from selenium.common.exceptions import TimeoutException
 
@@ -12,7 +12,7 @@ class InspectRequestsMixin:
     """Mixin class that provides functions to inspect and modify browser requests."""
 
     @property
-    def requests(self) -> List[Request]:
+    def requests(self) -> list[Request]:
         """Retrieves the requests made between the browser and server.
 
         Captured requests can be cleared with 'del', e.g:
@@ -37,7 +37,7 @@ class InspectRequestsMixin:
         yield from self.backend.storage.iter_requests()
 
     @property
-    def last_request(self) -> Optional[Request]:
+    def last_request(self) -> Request | None:
         """Retrieve the last request made between the browser and server.
 
         Note that this is more efficient than running requests[-1]
@@ -48,7 +48,7 @@ class InspectRequestsMixin:
         """
         return self.backend.storage.load_last_request()
 
-    def wait_for_request(self, pat: str, timeout: Union[int, float] = 10) -> Request:
+    def wait_for_request(self, pat: str, timeout: float = 10) -> Request:
         """Wait up to the timeout period for a request matching the specified
         pattern to be seen.
 
@@ -80,7 +80,9 @@ class InspectRequestsMixin:
             else:
                 return request
 
-        raise TimeoutException('Timed out after {}s waiting for request matching {}'.format(timeout, pat))
+        raise TimeoutException(
+            f"Timed out after {timeout}s waiting for request matching {pat}"
+        )
 
     @property
     def har(self) -> str:
@@ -134,7 +136,7 @@ class InspectRequestsMixin:
     def _validate_headers(self, headers):
         for v in headers.values():
             if v is not None:
-                assert isinstance(v, str), 'Header values must be strings'
+                assert isinstance(v, str), "Header values must be strings"
 
     @header_overrides.deleter
     def header_overrides(self):
@@ -259,7 +261,7 @@ class InspectRequestsMixin:
         del self.backend.modifier.rewrite_rules
 
     @property
-    def scopes(self) -> List[str]:
+    def scopes(self) -> list[str]:
         """The URL patterns used to scope request capture.
 
         The value of the scopes should be a list (or tuple) of
@@ -274,7 +276,7 @@ class InspectRequestsMixin:
         return self.backend.scopes
 
     @scopes.setter
-    def scopes(self, scopes: List[str]):
+    def scopes(self, scopes: list[str]):
         self.backend.scopes = scopes
 
     @scopes.deleter
@@ -310,7 +312,9 @@ class InspectRequestsMixin:
     @response_interceptor.setter
     def response_interceptor(self, interceptor: callable):
         if len(inspect.signature(interceptor).parameters) != 2:
-            raise RuntimeError('A response interceptor takes two parameters: the request and response')
+            raise RuntimeError(
+                "A response interceptor takes two parameters: the request and response"
+            )
         self.backend.response_interceptor = interceptor
 
     @response_interceptor.deleter

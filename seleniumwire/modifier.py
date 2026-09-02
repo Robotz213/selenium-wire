@@ -197,7 +197,14 @@ class RequestModifier:
         with self._lock:
             self._rewrite_rules.clear()
 
-    def modify_request(self, request, urlattr='url', methodattr='method', headersattr='headers', bodyattr='body'):
+    def modify_request(
+        self,
+        request,
+        urlattr="url",
+        methodattr="method",
+        headersattr="headers",
+        bodyattr="body",
+    ):
         """Performs modifications to the request.
 
         Args:
@@ -207,20 +214,22 @@ class RequestModifier:
             headersattr: The name of the headers attribute on the request object.
             bodyattr: The name of the body attribute on the request object.
         """
-        override_headers = self._get_matching_overrides(self._headers, getattr(request, urlattr))
+        override_headers = self._get_matching_overrides(
+            self._headers, getattr(request, urlattr)
+        )
         if override_headers:
             # We're only interested in request headers
             override_headers = {
                 name: value
                 for name, value in (override_headers or {}).items()
-                if not name.lower().startswith('response:')
+                if not name.lower().startswith("response:")
             }
             self._modify_headers(getattr(request, headersattr), override_headers)
         self._modify_params(request, urlattr, methodattr, headersattr, bodyattr)
         self._modify_querystring(request, urlattr)
         self._rewrite_url(request, urlattr, headersattr)
 
-    def modify_response(self, response, request, urlattr='url', headersattr='headers'):
+    def modify_response(self, response, request, urlattr="url", headersattr="headers"):
         """Performs modifications to the response.
 
         Args:
@@ -229,13 +238,15 @@ class RequestModifier:
             urlattr: The name of the url attribute on the response object.
             headersattr: The name of the headers attribute on the response object.
         """
-        override_headers = self._get_matching_overrides(self._headers, getattr(request, urlattr))
+        override_headers = self._get_matching_overrides(
+            self._headers, getattr(request, urlattr)
+        )
 
         # We're only interested in response headers
         override_headers = {
-            name.split(':', maxsplit=1)[1].strip(): value
+            name.split(":", maxsplit=1)[1].strip(): value
             for name, value in (override_headers or {}).items()
-            if name.lower().startswith('response:')
+            if name.lower().startswith("response:")
         }
 
         if override_headers:
@@ -270,10 +281,12 @@ class RequestModifier:
         method = getattr(request, methodattr)
         headers = getattr(request, headersattr)
         query = urlsplit(request_url).query
-        is_form_data = headers.get('Content-Type') == 'application/x-www-form-urlencoded'
+        is_form_data = (
+            headers.get("Content-Type") == "application/x-www-form-urlencoded"
+        )
 
-        if method == 'POST' and is_form_data:
-            query = getattr(request, bodyattr).decode('utf-8', errors='replace')
+        if method == "POST" and is_form_data:
+            query = getattr(request, bodyattr).decode("utf-8", errors="replace")
 
         request_params = parse_qs(query, keep_blank_values=True)
 
@@ -289,13 +302,15 @@ class RequestModifier:
         query = urlencode(request_params, doseq=True)
 
         # Update the request with the new params
-        if method == 'POST' and is_form_data:
-            query = query.encode('utf-8')
-            headers['Content-Length'] = str(len(query))
+        if method == "POST" and is_form_data:
+            query = query.encode("utf-8")
+            headers["Content-Length"] = str(len(query))
             setattr(request, bodyattr, query)
         else:
             scheme, netloc, path, _, fragment = urlsplit(request_url)
-            setattr(request, urlattr, urlunsplit((scheme, netloc, path, query, fragment)))
+            setattr(
+                request, urlattr, urlunsplit((scheme, netloc, path, query, fragment))
+            )
 
     def _modify_querystring(self, request, urlattr):
         request_url = getattr(request, urlattr)
@@ -305,7 +320,11 @@ class RequestModifier:
             return
 
         scheme, netloc, path, _, fragment = urlsplit(request_url)
-        setattr(request, urlattr, urlunsplit((scheme, netloc, path, querystring or '', fragment)))
+        setattr(
+            request,
+            urlattr,
+            urlunsplit((scheme, netloc, path, querystring or "", fragment)),
+        )
 
     def _rewrite_url(self, request, urlattr, headersattr):
         request_headers = getattr(request, headersattr)
@@ -328,8 +347,8 @@ class RequestModifier:
 
         if original_netloc != modified_netloc:
             # Modify the Host header if it exists
-            if 'Host' in request_headers:
-                request_headers['Host'] = modified_netloc
+            if "Host" in request_headers:
+                request_headers["Host"] = modified_netloc
 
     def _get_matching_overrides(self, overrides, url):
         with self._lock:

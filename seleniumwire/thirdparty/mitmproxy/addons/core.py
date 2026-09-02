@@ -3,18 +3,15 @@ import os
 from collections.abc import Sequence
 
 import mitmproxy.types
-
-from seleniumwire.thirdparty.mitmproxy import (
-    command,
-    ctx,
-    exceptions,
-    flow,
-    hooks,
-    optmanager,
-)
-from seleniumwire.thirdparty.mitmproxy.log import ALERT
-from seleniumwire.thirdparty.mitmproxy.net.http import status_codes
-from seleniumwire.thirdparty.mitmproxy.utils import emoji
+from mitmproxy import command
+from mitmproxy import ctx
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy import hooks
+from mitmproxy import optmanager
+from mitmproxy.log import ALERT
+from mitmproxy.net.http import status_codes
+from mitmproxy.utils import emoji
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +69,7 @@ class Core:
         """
         updated = []
         if not (marker == "" or marker in emoji.emoji):
-            raise exceptions.CommandError("invalid marker value")
+            raise exceptions.CommandError(f"invalid marker value")
 
         for i in flows:
             i.marked = marker

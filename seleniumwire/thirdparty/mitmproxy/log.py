@@ -6,12 +6,12 @@ import typing
 import warnings
 from dataclasses import dataclass
 
-from seleniumwire.thirdparty.mitmproxy import hooks
-from seleniumwire.thirdparty.mitmproxy.contrib import click as miniclick
-from seleniumwire.thirdparty.mitmproxy.utils import human
+from mitmproxy import hooks
+from mitmproxy.contrib import click as miniclick
+from mitmproxy.utils import human
 
 if typing.TYPE_CHECKING:
-    from seleniumwire.thirdparty.mitmproxy import master
+    from mitmproxy import master
 
 ALERT = logging.INFO + 1
 """

@@ -13,11 +13,14 @@ import threading
 import time
 from collections.abc import Callable
 from io import BufferedIOBase
-from typing import Any, ClassVar, cast
+from typing import Any
+from typing import cast
+from typing import ClassVar
 
 import pydivert.consts
 
-from seleniumwire.thirdparty.mitmproxy.net.local_ip import get_local_ip, get_local_ip6
+from mitmproxy.net.local_ip import get_local_ip
+from mitmproxy.net.local_ip import get_local_ip6
 
 REDIRECT_API_HOST = "127.0.0.1"
 REDIRECT_API_PORT = 8085
@@ -399,7 +402,7 @@ class TransparentProxy:
     - We assume that ephemeral TCP ports are not re-used for multiple connections at the same time.
     The proxy will fail if an application connects to example.com and example.org from
     192.168.0.42:4242 simultaneously. This could be mitigated by introducing unique "meta-addresses"
-    which mitmproxy sees, but this would remove the correct client info from seleniumwire.thirdparty.mitmproxy.
+    which mitmproxy sees, but this would remove the correct client info from mitmproxy.
     """
 
     local: RedirectLocal | None = None
@@ -575,7 +578,7 @@ if __name__ == "__main__":
         """Redirect flows to mitmproxy."""
         proxy = TransparentProxy(**options)
         proxy.start()
-        print(" * Redirection active.")
+        print(f" * Redirection active.")
         print(f"   Filter: {proxy.filter}")
         try:
             while True:

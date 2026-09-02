@@ -1,4 +1,4 @@
-from seleniumwire.thirdparty.mitmproxy.tools.console.keymap import Keymap
+from mitmproxy.tools.console.keymap import Keymap
 
 
 def map(km: Keymap) -> None:

@@ -1,7 +1,9 @@
 from collections.abc import Sequence
 
-from seleniumwire.thirdparty.mitmproxy import command, ctx, flow
-from seleniumwire.thirdparty.mitmproxy.hooks import UpdateHook
+from mitmproxy import command
+from mitmproxy import ctx
+from mitmproxy import flow
+from mitmproxy.hooks import UpdateHook
 
 
 class Comment:

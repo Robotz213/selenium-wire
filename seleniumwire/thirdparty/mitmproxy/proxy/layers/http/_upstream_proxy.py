@@ -4,14 +4,16 @@ from logging import DEBUG
 
 from h11._receivebuffer import ReceiveBuffer
 
-from seleniumwire.thirdparty.mitmproxy import connection, http
-from seleniumwire.thirdparty.mitmproxy.net.http import http1
-from seleniumwire.thirdparty.mitmproxy.proxy import commands, context, layer, tunnel
-from seleniumwire.thirdparty.mitmproxy.proxy.layers import tls
-from seleniumwire.thirdparty.mitmproxy.proxy.layers.http._hooks import (
-    HttpConnectUpstreamHook,
-)
-from seleniumwire.thirdparty.mitmproxy.utils import human
+from mitmproxy import connection
+from mitmproxy import http
+from mitmproxy.net.http import http1
+from mitmproxy.proxy import commands
+from mitmproxy.proxy import context
+from mitmproxy.proxy import layer
+from mitmproxy.proxy import tunnel
+from mitmproxy.proxy.layers import tls
+from mitmproxy.proxy.layers.http._hooks import HttpConnectUpstreamHook
+from mitmproxy.utils import human
 
 
 class HttpUpstreamProxy(tunnel.TunnelLayer):

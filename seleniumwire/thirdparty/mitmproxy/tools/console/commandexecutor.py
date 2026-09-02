@@ -1,8 +1,10 @@
 import logging
 from collections.abc import Sequence
 
-from seleniumwire.thirdparty.mitmproxy import exceptions, flow
-from seleniumwire.thirdparty.mitmproxy.tools.console import overlay, signals
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy.tools.console import overlay
+from mitmproxy.tools.console import signals
 
 
 class CommandExecutor:
@@ -17,7 +19,7 @@ class CommandExecutor:
                 logging.error(str(e))
             else:
                 if ret is not None:
-                    if type(ret) == Sequence[flow.Flow]:
+                    if type(ret) == Sequence[flow.Flow]:  # noqa: E721
                         signals.status_message.send(
                             message="Command returned %s flows" % len(ret)
                         )

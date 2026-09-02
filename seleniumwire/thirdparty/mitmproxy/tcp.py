@@ -1,7 +1,8 @@
 import time
 
-from seleniumwire.thirdparty.mitmproxy import connection, flow
-from seleniumwire.thirdparty.mitmproxy.coretypes import serializable
+from mitmproxy import connection
+from mitmproxy import flow
+from mitmproxy.coretypes import serializable
 
 
 class TCPMessage(serializable.Serializable):

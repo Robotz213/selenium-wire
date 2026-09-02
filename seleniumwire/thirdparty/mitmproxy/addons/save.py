@@ -5,29 +5,28 @@ from collections.abc import Sequence
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
+from typing import Optional
 
 import mitmproxy.types
-
-from seleniumwire.thirdparty.mitmproxy import (
-    command,
-    ctx,
-    dns,
-    exceptions,
-    flow,
-    flowfilter,
-    http,
-    io,
-    tcp,
-    udp,
-)
-from seleniumwire.thirdparty.mitmproxy.log import ALERT
+from mitmproxy import command
+from mitmproxy import ctx
+from mitmproxy import dns
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy import flowfilter
+from mitmproxy import http
+from mitmproxy import io
+from mitmproxy import tcp
+from mitmproxy import udp
+from mitmproxy.log import ALERT
 
 
 @lru_cache
 def _path(path: str) -> str:
     """Extract the path from a path spec (which may have an extra "+" at the front)"""
-    path = path.removeprefix("+")
+    if path.startswith("+"):
+        path = path[1:]
     return os.path.expanduser(path)
 
 
@@ -146,7 +145,7 @@ class Save:
         if path.endswith(".har") or path.endswith(".zhar"):  # pragma: no cover
             logging.log(
                 ALERT,
-                "Saved as mitmproxy dump file. To save HAR files, use the `save.har` command.",
+                f"Saved as mitmproxy dump file. To save HAR files, use the `save.har` command.",
             )
         else:
             logging.log(ALERT, f"Saved {len(flows)} flows.")

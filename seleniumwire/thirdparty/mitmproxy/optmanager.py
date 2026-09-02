@@ -5,15 +5,20 @@ import copy
 import pprint
 import textwrap
 import weakref
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable
+from collections.abc import Iterable
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, TextIO
+from typing import Any
+from typing import Optional
+from typing import TextIO
 
 import ruamel.yaml
 
-from seleniumwire.thirdparty.mitmproxy import exceptions
-from seleniumwire.thirdparty.mitmproxy.utils import signals, typecheck
+from mitmproxy import exceptions
+from mitmproxy.utils import signals
+from mitmproxy.utils import typecheck
 
 """
     The base implementation for Options.
@@ -23,7 +28,7 @@ unset = object()
 
 
 class _Option:
-    __slots__ = ("_default", "choices", "help", "name", "typespec", "value")
+    __slots__ = ("name", "typespec", "value", "_default", "choices", "help")
 
     def __init__(
         self,
@@ -298,7 +303,9 @@ class OptManager:
         options = pprint.pformat(self._options, indent=4).strip(" {}")
         if "\n" in options:
             options = "\n    " + options + "\n"
-        return f"{type(self).__module__}.{type(self).__name__}({{{options}}})"
+        return "{mod}.{cls}({{{options}}})".format(
+            mod=type(self).__module__, cls=type(self).__name__, options=options
+        )
 
     def set(self, *specs: str, defer: bool = False) -> None:
         """
@@ -351,7 +358,7 @@ class OptManager:
                     value = self._parse_setval(self._options[optname], value.val)
                 update[optname] = value
         self.update(**update)
-        for k in update:
+        for k in update.keys():
             del self.deferred[k]
 
     def _parse_setval(self, o: _Option, values: list[str]) -> Any:

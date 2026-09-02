@@ -3,21 +3,19 @@ import re
 
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy import flow
-from seleniumwire.thirdparty.mitmproxy.tools.console import (
-    commands,
-    common,
-    eventlog,
-    flowlist,
-    flowview,
-    grideditor,
-    help,
-    keybindings,
-    options,
-    overlay,
-    signals,
-    statusbar,
-)
+from mitmproxy import flow
+from mitmproxy.tools.console import commands
+from mitmproxy.tools.console import common
+from mitmproxy.tools.console import eventlog
+from mitmproxy.tools.console import flowlist
+from mitmproxy.tools.console import flowview
+from mitmproxy.tools.console import grideditor
+from mitmproxy.tools.console import help
+from mitmproxy.tools.console import keybindings
+from mitmproxy.tools.console import options
+from mitmproxy.tools.console import overlay
+from mitmproxy.tools.console import signals
+from mitmproxy.tools.console import statusbar
 
 
 class StackWidget(urwid.Frame):

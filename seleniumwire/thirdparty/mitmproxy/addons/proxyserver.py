@@ -8,36 +8,35 @@ import asyncio
 import collections
 import ipaddress
 import logging
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable
+from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Optional
 
 from wsproto.frame_protocol import Opcode
 
-from seleniumwire.thirdparty.mitmproxy import (
-    command,
-    ctx,
-    exceptions,
-    http,
-    platform,
-    tcp,
-    udp,
-    websocket,
-)
-from seleniumwire.thirdparty.mitmproxy.connection import Address
-from seleniumwire.thirdparty.mitmproxy.flow import Flow
-from seleniumwire.thirdparty.mitmproxy.proxy import events, mode_specs, server_hooks
-from seleniumwire.thirdparty.mitmproxy.proxy.layers.tcp import TcpMessageInjected
-from seleniumwire.thirdparty.mitmproxy.proxy.layers.udp import UdpMessageInjected
-from seleniumwire.thirdparty.mitmproxy.proxy.layers.websocket import (
-    WebSocketMessageInjected,
-)
-from seleniumwire.thirdparty.mitmproxy.proxy.mode_servers import (
-    ProxyConnectionHandler,
-    ServerInstance,
-    ServerManager,
-)
-from seleniumwire.thirdparty.mitmproxy.utils import asyncio_utils, human, signals
+from mitmproxy import command
+from mitmproxy import ctx
+from mitmproxy import exceptions
+from mitmproxy import http
+from mitmproxy import platform
+from mitmproxy import tcp
+from mitmproxy import udp
+from mitmproxy import websocket
+from mitmproxy.connection import Address
+from mitmproxy.flow import Flow
+from mitmproxy.proxy import events
+from mitmproxy.proxy import mode_specs
+from mitmproxy.proxy import server_hooks
+from mitmproxy.proxy.layers.tcp import TcpMessageInjected
+from mitmproxy.proxy.layers.udp import UdpMessageInjected
+from mitmproxy.proxy.layers.websocket import WebSocketMessageInjected
+from mitmproxy.proxy.mode_servers import ProxyConnectionHandler
+from mitmproxy.proxy.mode_servers import ServerInstance
+from mitmproxy.proxy.mode_servers import ServerManager
+from mitmproxy.utils import asyncio_utils
+from mitmproxy.utils import human
+from mitmproxy.utils import signals
 
 logger = logging.getLogger(__name__)
 
@@ -328,7 +327,7 @@ class Proxyserver(ServerManager):
 
         asyncio_utils.create_task(
             self.connections[connection_id].server_event(event),
-            name="inject_event",
+            name=f"inject_event",
             keep_ref=True,
             client=event.flow.client_conn.peername,
         )

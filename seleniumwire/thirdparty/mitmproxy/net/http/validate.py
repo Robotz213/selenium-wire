@@ -2,7 +2,9 @@ import logging
 import re
 import typing
 
-from seleniumwire.thirdparty.mitmproxy.http import Message, Request, Response
+from mitmproxy.http import Message
+from mitmproxy.http import Request
+from mitmproxy.http import Response
 
 logger = logging.getLogger(__name__)
 

@@ -2,27 +2,31 @@ from __future__ import annotations
 
 import shutil
 import sys
-from typing import IO, Optional
+from typing import IO
+from typing import Optional
 
-import mitmproxy_rs
 from wsproto.frame_protocol import CloseReason
 
-from seleniumwire.thirdparty.mitmproxy import (
-    contentviews,
-    ctx,
-    dns,
-    exceptions,
-    flow,
-    flowfilter,
-    http,
-)
-from seleniumwire.thirdparty.mitmproxy.contrib import click as miniclick
-from seleniumwire.thirdparty.mitmproxy.net.dns import response_codes
-from seleniumwire.thirdparty.mitmproxy.options import CONTENT_VIEW_LINES_CUTOFF
-from seleniumwire.thirdparty.mitmproxy.tcp import TCPFlow, TCPMessage
-from seleniumwire.thirdparty.mitmproxy.udp import UDPFlow, UDPMessage
-from seleniumwire.thirdparty.mitmproxy.utils import human, strutils, vt_codes
-from seleniumwire.thirdparty.mitmproxy.websocket import WebSocketData, WebSocketMessage
+import mitmproxy_rs
+from mitmproxy import contentviews
+from mitmproxy import ctx
+from mitmproxy import dns
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy import flowfilter
+from mitmproxy import http
+from mitmproxy.contrib import click as miniclick
+from mitmproxy.net.dns import response_codes
+from mitmproxy.options import CONTENT_VIEW_LINES_CUTOFF
+from mitmproxy.tcp import TCPFlow
+from mitmproxy.tcp import TCPMessage
+from mitmproxy.udp import UDPFlow
+from mitmproxy.udp import UDPMessage
+from mitmproxy.utils import human
+from mitmproxy.utils import strutils
+from mitmproxy.utils import vt_codes
+from mitmproxy.websocket import WebSocketData
+from mitmproxy.websocket import WebSocketMessage
 
 
 def indent(n: int, text: str) -> str:
@@ -276,7 +280,9 @@ class Dumper:
     def match(self, f):
         if ctx.options.flow_detail == 0:
             return False
-        if not self.filter or flowfilter.match(self.filter, f):
+        if not self.filter:
+            return True
+        elif flowfilter.match(self.filter, f):
             return True
         return False
 
@@ -363,7 +369,12 @@ class Dumper:
             else:
                 flow_type = f.type
             self.echo(
-                f"{human.format_address(f.client_conn.peername)} {direction} {flow_type} {direction} {human.format_address(f.server_conn.address)}"
+                "{client} {direction} {type} {direction} {server}".format(
+                    client=human.format_address(f.client_conn.peername),
+                    server=human.format_address(f.server_conn.address),
+                    direction=direction,
+                    type=flow_type,
+                )
             )
             if ctx.options.flow_detail >= 3:
                 self._echo_message(message, f)

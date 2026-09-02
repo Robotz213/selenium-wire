@@ -3,7 +3,8 @@ import os
 import pathlib
 from collections.abc import Sequence
 
-from seleniumwire.thirdparty.mitmproxy import command, ctx
+from mitmproxy import command
+from mitmproxy import ctx
 
 
 class CommandHistory:

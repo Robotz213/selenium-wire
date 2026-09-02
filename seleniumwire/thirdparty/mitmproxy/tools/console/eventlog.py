@@ -2,8 +2,8 @@ import collections
 
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy import log
-from seleniumwire.thirdparty.mitmproxy.tools.console import layoutwidget
+from mitmproxy import log
+from mitmproxy.tools.console import layoutwidget
 
 
 class LogBufferWalker(urwid.SimpleListWalker):

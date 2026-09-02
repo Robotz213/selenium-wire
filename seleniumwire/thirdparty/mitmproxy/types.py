@@ -3,13 +3,17 @@ import glob
 import os
 import re
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from typing import TYPE_CHECKING
+from typing import Union
 
-from seleniumwire.thirdparty.mitmproxy import exceptions, flow
-from seleniumwire.thirdparty.mitmproxy.utils import emoji, strutils
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy.utils import emoji
+from mitmproxy.utils import strutils
 
 if TYPE_CHECKING:  # pragma: no cover
-    from seleniumwire.thirdparty.mitmproxy.command import CommandManager
+    from mitmproxy.command import CommandManager
 
 
 class Path(str):
@@ -36,7 +40,7 @@ class CutSpec(Sequence[str]):
     pass
 
 
-class Data(Sequence[Sequence[str | bytes]]):
+class Data(Sequence[Sequence[Union[str, bytes]]]):
     pass
 
 

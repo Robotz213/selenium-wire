@@ -1,9 +1,11 @@
-import mitmproxy.flow
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy import http
-from seleniumwire.thirdparty.mitmproxy.tools.console import common, searchable
-from seleniumwire.thirdparty.mitmproxy.utils import human, strutils
+import mitmproxy.flow
+from mitmproxy import http
+from mitmproxy.tools.console import common
+from mitmproxy.tools.console import searchable
+from mitmproxy.utils import human
+from mitmproxy.utils import strutils
 
 
 def maybe_timestamp(base, attr):

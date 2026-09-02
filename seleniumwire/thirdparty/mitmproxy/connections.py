@@ -1,12 +1,13 @@
 import os
-import socket
 import time
+import typing
 import uuid
+import socket
 
 import socks
 
 from seleniumwire.thirdparty.mitmproxy import certs, exceptions, stateobject
-from seleniumwire.thirdparty.mitmproxy.net import tcp, tls
+from seleniumwire.thirdparty.mitmproxy.net import tls, tcp
 from seleniumwire.thirdparty.mitmproxy.utils import human, strutils
 
 
@@ -59,18 +60,22 @@ class ClientConnection(tcp.BaseHandler, stateobject.StateObject):
 
     def __repr__(self):
         if self.tls_established:
-            tls = f"[{self.tls_version}] "
+            tls = "[{}] ".format(self.tls_version)
         else:
             tls = ""
 
         if self.alpn_proto_negotiated:
-            alpn = (
-                f"[ALPN: {strutils.bytes_to_escaped_str(self.alpn_proto_negotiated)}] "
+            alpn = "[ALPN: {}] ".format(
+                strutils.bytes_to_escaped_str(self.alpn_proto_negotiated)
             )
         else:
             alpn = ""
 
-        return f"<ClientConnection: {tls}{alpn}{human.format_address(self.address)}>"
+        return "<ClientConnection: {tls}{alpn}{address}>".format(
+            tls=tls,
+            alpn=alpn,
+            address=human.format_address(self.address),
+        )
 
     def __eq__(self, other):
         if isinstance(other, ClientConnection):
@@ -93,7 +98,7 @@ class ClientConnection(tcp.BaseHandler, stateobject.StateObject):
         cipher_name=str,
         alpn_proto_negotiated=bytes,
         tls_version=str,
-        tls_extensions=list[tuple[int, bytes]],
+        tls_extensions=typing.List[typing.Tuple[int, bytes]],
     )
 
     def send(self, message):
@@ -198,12 +203,16 @@ class ServerConnection(tcp.TCPClient, stateobject.StateObject):
         else:
             tls = ""
         if self.alpn_proto_negotiated:
-            alpn = (
-                f"[ALPN: {strutils.bytes_to_escaped_str(self.alpn_proto_negotiated)}] "
+            alpn = "[ALPN: {}] ".format(
+                strutils.bytes_to_escaped_str(self.alpn_proto_negotiated)
             )
         else:
             alpn = ""
-        return f"<ServerConnection: {tls}{alpn}{human.format_address(self.address)}>"
+        return "<ServerConnection: {tls}{alpn}{address}>".format(
+            tls=tls,
+            alpn=alpn,
+            address=human.format_address(self.address),
+        )
 
     def __eq__(self, other):
         if isinstance(other, ServerConnection):
@@ -319,7 +328,7 @@ class SocksServerConnection(ServerConnection):
                 socks5h=socks.PROXY_TYPE_SOCKS5,
             )[self.socks_config.scheme]
         except KeyError:
-            raise TypeError(f"Invalid SOCKS scheme: {self.socks_config.scheme}")
+            raise TypeError("Invalid SOCKS scheme: {}".format(self.socks_config.scheme))
 
         s = socks.socksocket(family, type, proto)
         s.set_proxy(

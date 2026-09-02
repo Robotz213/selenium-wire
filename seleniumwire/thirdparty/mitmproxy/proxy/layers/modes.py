@@ -7,11 +7,13 @@ from abc import ABCMeta
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from seleniumwire.thirdparty.mitmproxy import connection
-from seleniumwire.thirdparty.mitmproxy.proxy import commands, events, layer
-from seleniumwire.thirdparty.mitmproxy.proxy.commands import StartHook
-from seleniumwire.thirdparty.mitmproxy.proxy.mode_specs import ReverseMode
-from seleniumwire.thirdparty.mitmproxy.proxy.utils import expect
+from mitmproxy import connection
+from mitmproxy.proxy import commands
+from mitmproxy.proxy import events
+from mitmproxy.proxy import layer
+from mitmproxy.proxy.commands import StartHook
+from mitmproxy.proxy.mode_specs import ReverseMode
+from mitmproxy.proxy.utils import expect
 
 if sys.version_info < (3, 11):
     from typing_extensions import assert_never

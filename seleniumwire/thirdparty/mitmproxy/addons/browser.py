@@ -3,8 +3,9 @@ import shutil
 import subprocess
 import tempfile
 
-from seleniumwire.thirdparty.mitmproxy import command, ctx
-from seleniumwire.thirdparty.mitmproxy.log import ALERT
+from mitmproxy import command
+from mitmproxy import ctx
+from mitmproxy.log import ALERT
 
 
 def find_executable_cmd(*search_paths) -> list[str] | None:

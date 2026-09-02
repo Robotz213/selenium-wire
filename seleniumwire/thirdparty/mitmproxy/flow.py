@@ -4,11 +4,15 @@ import asyncio
 import copy
 import time
 import uuid
-from dataclasses import dataclass, field
-from typing import Any, ClassVar
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Any
+from typing import ClassVar
 
-from seleniumwire.thirdparty.mitmproxy import connection, exceptions, version
-from seleniumwire.thirdparty.mitmproxy.coretypes import serializable
+from mitmproxy import connection
+from mitmproxy import exceptions
+from mitmproxy import version
+from mitmproxy.coretypes import serializable
 
 
 @dataclass
@@ -279,6 +283,6 @@ class Flow(serializable.Serializable):
 
 
 __all__ = [
-    "Error",
     "Flow",
+    "Error",
 ]

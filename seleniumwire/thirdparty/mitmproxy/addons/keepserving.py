@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import asyncio
 
-from seleniumwire.thirdparty.mitmproxy import ctx
-from seleniumwire.thirdparty.mitmproxy.utils import asyncio_utils
+from mitmproxy import ctx
+from mitmproxy.utils import asyncio_utils
 
 
 class KeepServing:

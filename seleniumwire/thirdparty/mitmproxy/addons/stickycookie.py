@@ -2,8 +2,11 @@ import collections
 from http import cookiejar
 from typing import Optional
 
-from seleniumwire.thirdparty.mitmproxy import ctx, exceptions, flowfilter, http
-from seleniumwire.thirdparty.mitmproxy.net.http import cookies
+from mitmproxy import ctx
+from mitmproxy import exceptions
+from mitmproxy import flowfilter
+from mitmproxy import http
+from mitmproxy.net.http import cookies
 
 TOrigin = tuple[str, int, str]
 
@@ -22,7 +25,9 @@ def ckey(attrs: dict[str, str], f: http.HTTPFlow) -> TOrigin:
 
 
 def domain_match(a: str, b: str) -> bool:
-    if cookiejar.domain_match(a, b) or cookiejar.domain_match(a, b.strip(".")):  # type: ignore
+    if cookiejar.domain_match(a, b):  # type: ignore
+        return True
+    elif cookiejar.domain_match(a, b.strip(".")):  # type: ignore
         return True
     return False
 

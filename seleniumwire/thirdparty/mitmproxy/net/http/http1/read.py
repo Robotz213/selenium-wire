@@ -3,8 +3,11 @@ import time
 import typing
 from collections.abc import Iterable
 
-from seleniumwire.thirdparty.mitmproxy.http import Headers, Request, Response
-from seleniumwire.thirdparty.mitmproxy.net.http import url, validate
+from mitmproxy.http import Headers
+from mitmproxy.http import Request
+from mitmproxy.http import Response
+from mitmproxy.net.http import url
+from mitmproxy.net.http import validate
 
 
 def get_header_tokens(headers, key):

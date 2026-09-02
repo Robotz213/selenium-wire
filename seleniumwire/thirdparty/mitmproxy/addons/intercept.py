@@ -1,6 +1,9 @@
 from typing import Optional
 
-from seleniumwire.thirdparty.mitmproxy import ctx, exceptions, flow, flowfilter
+from mitmproxy import ctx
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy import flowfilter
 
 
 class Intercept:

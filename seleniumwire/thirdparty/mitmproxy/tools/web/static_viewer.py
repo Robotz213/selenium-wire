@@ -7,16 +7,14 @@ import time
 from collections.abc import Iterable
 from typing import Optional
 
-from seleniumwire.thirdparty.mitmproxy import (
-    contentviews,
-    ctx,
-    flow,
-    flowfilter,
-    http,
-    io,
-    version,
-)
-from seleniumwire.thirdparty.mitmproxy.tools.web.app import flow_to_json
+from mitmproxy import contentviews
+from mitmproxy import ctx
+from mitmproxy import flow
+from mitmproxy import flowfilter
+from mitmproxy import http
+from mitmproxy import io
+from mitmproxy import version
+from mitmproxy.tools.web.app import flow_to_json
 
 web_dir = pathlib.Path(__file__).absolute().parent
 

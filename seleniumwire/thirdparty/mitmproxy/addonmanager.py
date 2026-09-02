@@ -5,11 +5,14 @@ import pprint
 import sys
 import traceback
 import types
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from seleniumwire.thirdparty.mitmproxy import exceptions, flow, hooks
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy import hooks
 
 logger = logging.getLogger(__name__)
 
@@ -164,10 +167,10 @@ class AddonManager:
         """
         api_changes = {
             # mitmproxy 6 -> mitmproxy 7
-            "clientconnect": "The clientconnect event has been removed, use client_connected instead",
-            "clientdisconnect": "The clientdisconnect event has been removed, use client_disconnected instead",
+            "clientconnect": f"The clientconnect event has been removed, use client_connected instead",
+            "clientdisconnect": f"The clientdisconnect event has been removed, use client_disconnected instead",
             "serverconnect": "The serverconnect event has been removed, use server_connect and server_connected instead",
-            "serverdisconnect": "The serverdisconnect event has been removed, use server_disconnected instead",
+            "serverdisconnect": f"The serverdisconnect event has been removed, use server_disconnected instead",
             # mitmproxy 8 -> mitmproxy 9
             "add_log": "The add_log event has been deprecated, use Python's builtin logging module instead",
         }
@@ -249,7 +252,7 @@ class AddonManager:
                     yield a, func
                 elif isinstance(func, types.ModuleType):
                     # we gracefully exclude module imports with the same name as hooks.
-                    # For example, a user may have "from seleniumwire.thirdparty.mitmproxy import log" in an addon,
+                    # For example, a user may have "from mitmproxy import log" in an addon,
                     # which has the same name as the "log" hook. In this particular case,
                     # we end up in an error loop because we "log" this error.
                     pass

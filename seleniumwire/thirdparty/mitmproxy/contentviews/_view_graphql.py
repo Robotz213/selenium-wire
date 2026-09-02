@@ -1,17 +1,18 @@
 import json
 from typing import Any
 
-from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
+from mitmproxy.contentviews._api import Contentview
+from mitmproxy.contentviews._api import Metadata
 
 
 def format_graphql(data):
     query = data["query"]
     header_data = data.copy()
     header_data["query"] = "..."
-    return f"""{json.dumps(header_data, indent=2)}
+    return """{header}
 ---
 {query}
-"""
+""".format(header=json.dumps(header_data, indent=2), query=query)
 
 
 def format_query_list(data: list[Any]):

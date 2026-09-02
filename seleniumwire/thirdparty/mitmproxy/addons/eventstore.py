@@ -3,9 +3,10 @@ import collections
 import logging
 from collections.abc import Callable
 
-from seleniumwire.thirdparty.mitmproxy import command, log
-from seleniumwire.thirdparty.mitmproxy.log import LogEntry
-from seleniumwire.thirdparty.mitmproxy.utils import signals
+from mitmproxy import command
+from mitmproxy import log
+from mitmproxy.log import LogEntry
+from mitmproxy.utils import signals
 
 
 class EventStore:

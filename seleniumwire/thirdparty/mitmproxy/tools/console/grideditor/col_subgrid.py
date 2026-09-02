@@ -1,8 +1,8 @@
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy.net.http import cookies
-from seleniumwire.thirdparty.mitmproxy.tools.console import signals
-from seleniumwire.thirdparty.mitmproxy.tools.console.grideditor import base
+from mitmproxy.net.http import cookies
+from mitmproxy.tools.console import signals
+from mitmproxy.tools.console.grideditor import base
 
 
 class Column(base.Column):

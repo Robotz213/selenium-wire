@@ -12,20 +12,18 @@ import traceback
 import warnings
 from dataclasses import dataclass
 
-import mitmproxy_rs.contentviews
-
-from seleniumwire.thirdparty.mitmproxy import flow
-from seleniumwire.thirdparty.mitmproxy.utils import strutils
-
 from ..addonmanager import cut_traceback
-from ._api import Contentview, InteractiveContentview, Metadata, SyntaxHighlight
-from ._compat import (
-    LegacyContentview,
-    get,  # noqa: F401
-    remove,  # noqa: F401
-)
+from ._api import Contentview
+from ._api import InteractiveContentview
+from ._api import Metadata
+from ._api import SyntaxHighlight
+from ._compat import get  # noqa: F401
+from ._compat import LegacyContentview
+from ._compat import remove  # noqa: F401
 from ._registry import ContentviewRegistry
-from ._utils import ContentviewMessage, get_data, make_metadata
+from ._utils import ContentviewMessage
+from ._utils import get_data
+from ._utils import make_metadata
 from ._view_css import css
 from ._view_dns import dns
 from ._view_graphql import graphql
@@ -43,6 +41,9 @@ from ._view_wbxml import wbxml
 from ._view_xml_html import xml_html
 from ._view_zip import zip
 from .base import View
+import mitmproxy_rs.contentviews
+from mitmproxy import flow
+from mitmproxy.utils import strutils
 
 logger = logging.getLogger(__name__)
 

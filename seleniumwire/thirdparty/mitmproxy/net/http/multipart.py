@@ -5,7 +5,7 @@ import re
 import warnings
 from urllib.parse import quote
 
-from seleniumwire.thirdparty.mitmproxy.net.http import headers
+from mitmproxy.net.http import headers
 
 
 def encode_multipart(content_type: str, parts: list[tuple[bytes, bytes]]) -> bytes:

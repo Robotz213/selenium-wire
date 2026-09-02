@@ -1,4 +1,4 @@
-from seleniumwire.thirdparty.mitmproxy import ctx
+from mitmproxy import ctx
 
 
 class AntiComp:

@@ -5,23 +5,21 @@ from typing import cast
 import tornado.httpserver
 import tornado.ioloop
 
-from seleniumwire.thirdparty.mitmproxy import (
-    addons,
-    flow,
-    log,
-    master,
-    options,
-    optmanager,
-)
-from seleniumwire.thirdparty.mitmproxy.addons import (
-    errorcheck,
-    eventstore,
-    intercept,
-    readfile,
-    view,
-)
-from seleniumwire.thirdparty.mitmproxy.addons.proxyserver import Proxyserver
-from seleniumwire.thirdparty.mitmproxy.tools.web import app, static_viewer, webaddons
+from mitmproxy import addons
+from mitmproxy import flow
+from mitmproxy import log
+from mitmproxy import master
+from mitmproxy import options
+from mitmproxy import optmanager
+from mitmproxy.addons import errorcheck
+from mitmproxy.addons import eventstore
+from mitmproxy.addons import intercept
+from mitmproxy.addons import readfile
+from mitmproxy.addons import view
+from mitmproxy.addons.proxyserver import Proxyserver
+from mitmproxy.tools.web import app
+from mitmproxy.tools.web import static_viewer
+from mitmproxy.tools.web import webaddons
 
 logger = logging.getLogger(__name__)
 

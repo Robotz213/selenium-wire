@@ -2,8 +2,9 @@ import textwrap
 
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy.tools.console import layoutwidget, signals
-from seleniumwire.thirdparty.mitmproxy.utils import signals as utils_signals
+from mitmproxy.tools.console import layoutwidget
+from mitmproxy.tools.console import signals
+from mitmproxy.utils import signals as utils_signals
 
 HELP_HEIGHT = 5
 

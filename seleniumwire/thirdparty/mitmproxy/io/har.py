@@ -5,8 +5,10 @@ import logging
 import time
 from datetime import datetime
 
-from seleniumwire.thirdparty.mitmproxy import connection, exceptions, http
-from seleniumwire.thirdparty.mitmproxy.net.http.headers import infer_content_encoding
+from mitmproxy import connection
+from mitmproxy import exceptions
+from mitmproxy import http
+from mitmproxy.net.http.headers import infer_content_encoding
 
 logger = logging.getLogger(__name__)
 

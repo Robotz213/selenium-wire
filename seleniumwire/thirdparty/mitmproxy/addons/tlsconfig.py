@@ -4,26 +4,27 @@ import os
 import ssl
 import urllib.parse
 from pathlib import Path
-from typing import Any, Literal, TypedDict
+from typing import Any
+from typing import Literal
+from typing import TypedDict
 
 from aioquic.h3.connection import H3_ALPN
 from aioquic.tls import CipherSuite
 from cryptography import x509
 from OpenSSL import SSL
 
-from seleniumwire.thirdparty.mitmproxy import (
-    certs,
-    connection,
-    ctx,
-    exceptions,
-    http,
-    tls,
-)
-from seleniumwire.thirdparty.mitmproxy.net import tls as net_tls
-from seleniumwire.thirdparty.mitmproxy.options import CONF_BASENAME
-from seleniumwire.thirdparty.mitmproxy.proxy import context
-from seleniumwire.thirdparty.mitmproxy.proxy.layers import modes, quic
-from seleniumwire.thirdparty.mitmproxy.proxy.layers import tls as proxy_tls
+from mitmproxy import certs
+from mitmproxy import connection
+from mitmproxy import ctx
+from mitmproxy import exceptions
+from mitmproxy import http
+from mitmproxy import tls
+from mitmproxy.net import tls as net_tls
+from mitmproxy.options import CONF_BASENAME
+from mitmproxy.proxy import context
+from mitmproxy.proxy.layers import modes
+from mitmproxy.proxy.layers import quic
+from mitmproxy.proxy.layers import tls as proxy_tls
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +110,8 @@ def alpn_select_callback(conn: SSL.Connection, options: list[bytes]) -> Any:
     for alpn in options:
         if alpn in http_alpns:
             return alpn
-    return SSL.NO_OVERLAPPING_PROTOCOLS
+    else:
+        return SSL.NO_OVERLAPPING_PROTOCOLS
 
 
 class TlsConfig:
@@ -149,7 +151,7 @@ class TlsConfig:
             typespec=str,
             default=net_tls.DEFAULT_MAX_VERSION.name,
             choices=[x.name for x in net_tls.Version],
-            help="Set the maximum TLS version for client connections.",
+            help=f"Set the maximum TLS version for client connections.",
         )
         loader.add_option(
             name="tls_version_server_min",
@@ -164,7 +166,7 @@ class TlsConfig:
             typespec=str,
             default=net_tls.DEFAULT_MAX_VERSION.name,
             choices=[x.name for x in net_tls.Version],
-            help="Set the maximum TLS version for server connections.",
+            help=f"Set the maximum TLS version for server connections.",
         )
         loader.add_option(
             name="tls_ecdh_curve_client",
@@ -184,7 +186,7 @@ class TlsConfig:
             name="request_client_cert",
             typespec=bool,
             default=False,
-            help="Requests a client certificate (TLS message 'CertificateRequest') to establish a mutual TLS connection between client and mitmproxy (combined with 'client_certs' option for mitmproxy and upstream).",
+            help=f"Requests a client certificate (TLS message 'CertificateRequest') to establish a mutual TLS connection between client and mitmproxy (combined with 'client_certs' option for mitmproxy and upstream).",
         )
         loader.add_option(
             "ciphers_client",

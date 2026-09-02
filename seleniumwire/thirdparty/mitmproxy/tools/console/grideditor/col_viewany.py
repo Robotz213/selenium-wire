@@ -6,8 +6,8 @@ from typing import Any
 
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy.tools.console.grideditor import base
-from seleniumwire.thirdparty.mitmproxy.utils import strutils
+from mitmproxy.tools.console.grideditor import base
+from mitmproxy.utils import strutils
 
 
 class Column(base.Column):

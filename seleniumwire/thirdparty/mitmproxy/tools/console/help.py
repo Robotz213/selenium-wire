@@ -1,7 +1,9 @@
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy import flowfilter
-from seleniumwire.thirdparty.mitmproxy.tools.console import common, layoutwidget, tabs
+from mitmproxy import flowfilter
+from mitmproxy.tools.console import common
+from mitmproxy.tools.console import layoutwidget
+from mitmproxy.tools.console import tabs
 
 
 class CListBox(urwid.ListBox):

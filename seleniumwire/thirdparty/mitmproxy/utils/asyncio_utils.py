@@ -2,10 +2,11 @@ import asyncio
 import os
 import sys
 import time
-from collections.abc import Coroutine, Iterator
+from collections.abc import Coroutine
+from collections.abc import Iterator
 from contextlib import contextmanager
 
-from seleniumwire.thirdparty.mitmproxy.utils import human
+from mitmproxy.utils import human
 
 _KEEP_ALIVE = set()
 
@@ -24,7 +25,7 @@ def create_task(
       This ensures that the task is not garbage collected mid-execution if no other reference is kept.
     - Use `client` to pass the client address as additional debug info on the task.
     """
-    t = asyncio.create_task(coro)
+    t = asyncio.create_task(coro)  # noqa: TID251
     set_task_debug_info(t, name=name, client=client)
     if keep_ref and not t.done():
         # The event loop only keeps weak references to tasks.

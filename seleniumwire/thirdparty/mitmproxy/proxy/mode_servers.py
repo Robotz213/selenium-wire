@@ -21,21 +21,31 @@ import socket
 import sys
 import textwrap
 import typing
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
+from abc import abstractmethod
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Generic, TypeVar, cast, get_args
+from typing import cast
+from typing import ClassVar
+from typing import Generic
+from typing import get_args
+from typing import TYPE_CHECKING
+from typing import TypeVar
 
 import mitmproxy_rs
-
-from seleniumwire.thirdparty.mitmproxy import ctx, flow, platform
-from seleniumwire.thirdparty.mitmproxy.connection import Address
-from seleniumwire.thirdparty.mitmproxy.net import local_ip
-from seleniumwire.thirdparty.mitmproxy.net.free_port import get_free_port
-from seleniumwire.thirdparty.mitmproxy.proxy import commands, layers, mode_specs, server
-from seleniumwire.thirdparty.mitmproxy.proxy.context import Context
-from seleniumwire.thirdparty.mitmproxy.proxy.layer import Layer
-from seleniumwire.thirdparty.mitmproxy.utils import human
+from mitmproxy import ctx
+from mitmproxy import flow
+from mitmproxy import platform
+from mitmproxy.connection import Address
+from mitmproxy.net import local_ip
+from mitmproxy.net.free_port import get_free_port
+from mitmproxy.proxy import commands
+from mitmproxy.proxy import layers
+from mitmproxy.proxy import mode_specs
+from mitmproxy.proxy import server
+from mitmproxy.proxy.context import Context
+from mitmproxy.proxy.layer import Layer
+from mitmproxy.utils import human
 
 if sys.version_info < (3, 11):
     from typing_extensions import Self  # pragma: no cover
@@ -43,7 +53,7 @@ else:
     from typing import Self
 
 if TYPE_CHECKING:
-    from seleniumwire.thirdparty.mitmproxy.master import Master
+    from mitmproxy.master import Master
 
 logger = logging.getLogger(__name__)
 

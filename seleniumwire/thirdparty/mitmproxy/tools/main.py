@@ -6,12 +6,18 @@ import logging
 import os
 import signal
 import sys
-from collections.abc import Callable, Sequence
-from typing import Any, TypeVar
+from collections.abc import Callable
+from collections.abc import Sequence
+from typing import Any
+from typing import TypeVar
 
-from seleniumwire.thirdparty.mitmproxy import exceptions, master, options, optmanager
-from seleniumwire.thirdparty.mitmproxy.tools import cmdline
-from seleniumwire.thirdparty.mitmproxy.utils import arg_check, debug
+from mitmproxy import exceptions
+from mitmproxy import master
+from mitmproxy import options
+from mitmproxy import optmanager
+from mitmproxy.tools import cmdline
+from mitmproxy.utils import arg_check
+from mitmproxy.utils import debug
 
 
 def process_options(parser, opts, args):
@@ -138,14 +144,14 @@ def run(
 
 
 def mitmproxy(args=None) -> int | None:  # pragma: no cover
-    from seleniumwire.thirdparty.mitmproxy.tools import console
+    from mitmproxy.tools import console
 
     run(console.master.ConsoleMaster, cmdline.mitmproxy, args)
     return None
 
 
 def mitmdump(args=None) -> int | None:  # pragma: no cover
-    from seleniumwire.thirdparty.mitmproxy.tools import dump
+    from mitmproxy.tools import dump
 
     def extra(args):
         if args.filter_args:
@@ -162,7 +168,7 @@ def mitmdump(args=None) -> int | None:  # pragma: no cover
 
 
 def mitmweb(args=None) -> int | None:  # pragma: no cover
-    from seleniumwire.thirdparty.mitmproxy.tools import web
+    from mitmproxy.tools import web
 
     run(web.master.WebMaster, cmdline.mitmweb, args)
     return None

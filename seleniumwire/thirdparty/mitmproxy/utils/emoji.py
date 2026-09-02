@@ -1859,7 +1859,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     import requests
 
-    from seleniumwire.thirdparty.mitmproxy.tools.console.common import SYMBOL_MARK
+    from mitmproxy.tools.console.common import SYMBOL_MARK
 
     CHAR_MARKERS = list(string.ascii_letters) + list(string.digits)
     EMOJI_SRC = '    ":{name}:": "{emoji_val}",'

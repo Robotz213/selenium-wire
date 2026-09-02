@@ -2,11 +2,17 @@ import json
 import os
 from collections.abc import Iterable
 from io import BufferedReader
-from typing import Any, BinaryIO, cast
+from typing import Any
+from typing import BinaryIO
+from typing import cast
+from typing import Union
 
-from seleniumwire.thirdparty.mitmproxy import exceptions, flow, flowfilter
-from seleniumwire.thirdparty.mitmproxy.io import compat, tnetstring
-from seleniumwire.thirdparty.mitmproxy.io.har import request_to_flow
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy import flowfilter
+from mitmproxy.io import compat
+from mitmproxy.io import tnetstring
+from mitmproxy.io.har import request_to_flow
 
 
 class FlowWriter:
@@ -60,7 +66,7 @@ class FlowReader:
                 while True:
                     # FIXME: This cast hides a lack of dynamic type checking
                     loaded = cast(
-                        dict[bytes | str, Any],
+                        dict[Union[bytes, str], Any],
                         tnetstring.load(self.fo),
                     )
                     try:

@@ -10,8 +10,8 @@ import copy
 import uuid
 from typing import Any
 
-from seleniumwire.thirdparty.mitmproxy import version
-from seleniumwire.thirdparty.mitmproxy.utils import strutils
+from mitmproxy import version
+from mitmproxy.utils import strutils
 
 
 def convert_011_012(data):

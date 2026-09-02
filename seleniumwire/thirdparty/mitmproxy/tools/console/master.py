@@ -14,23 +14,22 @@ from typing import TypeVar
 import urwid
 from tornado.platform.asyncio import AddThreadSelectorEventLoop
 
-from seleniumwire.thirdparty.mitmproxy import addons, log, master, options
-from seleniumwire.thirdparty.mitmproxy.addons import (
-    errorcheck,
-    eventstore,
-    intercept,
-    readfile,
-    view,
-)
-from seleniumwire.thirdparty.mitmproxy.tools.console import (
-    consoleaddons,
-    defaultkeys,
-    keymap,
-    palettes,
-    signals,
-    window,
-)
-from seleniumwire.thirdparty.mitmproxy.utils import strutils
+from mitmproxy import addons
+from mitmproxy import log
+from mitmproxy import master
+from mitmproxy import options
+from mitmproxy.addons import errorcheck
+from mitmproxy.addons import eventstore
+from mitmproxy.addons import intercept
+from mitmproxy.addons import readfile
+from mitmproxy.addons import view
+from mitmproxy.tools.console import consoleaddons
+from mitmproxy.tools.console import defaultkeys
+from mitmproxy.tools.console import keymap
+from mitmproxy.tools.console import palettes
+from mitmproxy.tools.console import signals
+from mitmproxy.tools.console import window
+from mitmproxy.utils import strutils
 
 T = TypeVar("T", str, bytes)
 

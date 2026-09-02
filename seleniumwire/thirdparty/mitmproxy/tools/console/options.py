@@ -8,12 +8,11 @@ from typing import Optional
 
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy import exceptions, optmanager
-from seleniumwire.thirdparty.mitmproxy.tools.console import (
-    layoutwidget,
-    overlay,
-    signals,
-)
+from mitmproxy import exceptions
+from mitmproxy import optmanager
+from mitmproxy.tools.console import layoutwidget
+from mitmproxy.tools.console import overlay
+from mitmproxy.tools.console import signals
 
 HELP_HEIGHT = 5
 

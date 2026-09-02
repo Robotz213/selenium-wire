@@ -4,13 +4,11 @@ from dataclasses import dataclass
 from kaitaistruct import KaitaiStream
 from OpenSSL import SSL
 
-from seleniumwire.thirdparty.mitmproxy import connection
-from seleniumwire.thirdparty.mitmproxy.contrib.kaitaistruct import (
-    dtls_client_hello,
-    tls_client_hello,
-)
-from seleniumwire.thirdparty.mitmproxy.net import check
-from seleniumwire.thirdparty.mitmproxy.proxy import context
+from mitmproxy import connection
+from mitmproxy.contrib.kaitaistruct import dtls_client_hello
+from mitmproxy.contrib.kaitaistruct import tls_client_hello
+from mitmproxy.net import check
+from mitmproxy.proxy import context
 
 
 class ClientHello:

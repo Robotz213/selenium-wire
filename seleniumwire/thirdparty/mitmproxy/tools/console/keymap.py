@@ -4,11 +4,14 @@ from collections import defaultdict
 from collections.abc import Sequence
 from functools import cache
 
-import mitmproxy.types
 import ruamel.yaml.error
 
-from seleniumwire.thirdparty.mitmproxy import command, ctx, exceptions
-from seleniumwire.thirdparty.mitmproxy.tools.console import commandexecutor, signals
+import mitmproxy.types
+from mitmproxy import command
+from mitmproxy import ctx
+from mitmproxy import exceptions
+from mitmproxy.tools.console import commandexecutor
+from mitmproxy.tools.console import signals
 
 
 class KeyBindingError(Exception):

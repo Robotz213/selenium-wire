@@ -5,24 +5,24 @@ import json
 import logging
 import zlib
 from collections.abc import Sequence
-from datetime import datetime, timezone
+from datetime import datetime
+from datetime import timezone
 from typing import Any
 
-from seleniumwire.thirdparty.mitmproxy import (
-    command,
-    ctx,
-    exceptions,
-    flow,
-    flowfilter,
-    http,
-    types,
-    version,
-)
-from seleniumwire.thirdparty.mitmproxy.addonmanager import Loader
-from seleniumwire.thirdparty.mitmproxy.connection import Server
-from seleniumwire.thirdparty.mitmproxy.coretypes.multidict import _MultiDict
-from seleniumwire.thirdparty.mitmproxy.log import ALERT
-from seleniumwire.thirdparty.mitmproxy.utils import human, strutils
+from mitmproxy import command
+from mitmproxy import ctx
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy import flowfilter
+from mitmproxy import http
+from mitmproxy import types
+from mitmproxy import version
+from mitmproxy.addonmanager import Loader
+from mitmproxy.connection import Server
+from mitmproxy.coretypes.multidict import _MultiDict
+from mitmproxy.log import ALERT
+from mitmproxy.utils import human
+from mitmproxy.utils import strutils
 
 logger = logging.getLogger(__name__)
 

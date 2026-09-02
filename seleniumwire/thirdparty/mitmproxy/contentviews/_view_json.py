@@ -1,6 +1,7 @@
 import json
 
-from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
+from mitmproxy.contentviews._api import Contentview
+from mitmproxy.contentviews._api import Metadata
 
 
 class JSONContentview(Contentview):

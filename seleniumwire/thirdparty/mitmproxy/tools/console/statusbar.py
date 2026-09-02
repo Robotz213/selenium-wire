@@ -3,18 +3,16 @@ from __future__ import annotations
 from collections.abc import Callable
 from functools import lru_cache
 
-import mitmproxy.tools.console.master
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy.tools.console import (
-    commandexecutor,
-    common,
-    flowlist,
-    quickhelp,
-    signals,
-)
-from seleniumwire.thirdparty.mitmproxy.tools.console.commander import commander
-from seleniumwire.thirdparty.mitmproxy.utils import human
+import mitmproxy.tools.console.master
+from mitmproxy.tools.console import commandexecutor
+from mitmproxy.tools.console import common
+from mitmproxy.tools.console import flowlist
+from mitmproxy.tools.console import quickhelp
+from mitmproxy.tools.console import signals
+from mitmproxy.tools.console.commander import commander
+from mitmproxy.utils import human
 
 
 @lru_cache

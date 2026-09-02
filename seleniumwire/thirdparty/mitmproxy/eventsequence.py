@@ -1,8 +1,14 @@
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
+from collections.abc import Iterator
 from typing import Any
 
-from seleniumwire.thirdparty.mitmproxy import dns, flow, hooks, http, tcp, udp
-from seleniumwire.thirdparty.mitmproxy.proxy import layers
+from mitmproxy import dns
+from mitmproxy import flow
+from mitmproxy import hooks
+from mitmproxy import http
+from mitmproxy import tcp
+from mitmproxy import udp
+from mitmproxy.proxy import layers
 
 TEventGenerator = Iterator[hooks.Hook]
 

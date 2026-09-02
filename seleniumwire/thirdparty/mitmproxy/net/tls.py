@@ -1,23 +1,24 @@
 import os
 import threading
 import typing
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
+from collections.abc import Iterable
 from enum import Enum
-from functools import cache, lru_cache
+from functools import cache
+from functools import lru_cache
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any
+from typing import BinaryIO
 
 import certifi
 import OpenSSL
-from cryptography.hazmat.primitives.asymmetric.ec import (
-    EllipticCurve,
-    EllipticCurveOID,
-    get_curve_for_oid,
-)
+from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurve
+from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurveOID
+from cryptography.hazmat.primitives.asymmetric.ec import get_curve_for_oid
 from cryptography.x509 import ObjectIdentifier
 from OpenSSL import SSL
 
-from seleniumwire.thirdparty.mitmproxy import certs
+from mitmproxy import certs
 
 # Remove once pyOpenSSL 23.3.0 is released and bump version in pyproject.toml.
 try:  # pragma: no cover

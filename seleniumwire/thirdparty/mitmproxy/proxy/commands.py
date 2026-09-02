@@ -9,11 +9,12 @@ The counterpart to commands are events.
 
 import logging
 import warnings
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
+from typing import Union
 
 import mitmproxy.hooks
-
-from seleniumwire.thirdparty.mitmproxy.connection import Connection, Server
+from mitmproxy.connection import Connection
+from mitmproxy.connection import Server
 
 if TYPE_CHECKING:
     import mitmproxy.proxy.layer

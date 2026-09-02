@@ -8,15 +8,18 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
+from typing import Optional
 
 from aioquic.buffer import Buffer as QuicBuffer
 from aioquic.quic.configuration import QuicConfiguration
-from aioquic.quic.connection import QuicConnection, QuicConnectionError
+from aioquic.quic.connection import QuicConnection
+from aioquic.quic.connection import QuicConnectionError
 from aioquic.quic.logger import QuicLogger
-from aioquic.quic.packet import PACKET_TYPE_INITIAL, pull_quic_header
+from aioquic.quic.packet import PACKET_TYPE_INITIAL
+from aioquic.quic.packet import pull_quic_header
 from aioquic.tls import HandshakeType
 
-from seleniumwire.thirdparty.mitmproxy.tls import ClientHello
+from mitmproxy.tls import ClientHello
 
 
 @dataclass
@@ -28,7 +31,7 @@ class QuicClientHello(Exception):
 
 def quic_parse_client_hello_from_datagrams(
     datagrams: list[bytes],
-) -> ClientHello | None:
+) -> Optional[ClientHello]:
     """
     Check if the supplied bytes contain a full ClientHello message,
     and if so, parse it.

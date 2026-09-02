@@ -1,14 +1,17 @@
 import struct
 import time
 from dataclasses import dataclass
+from typing import List
 from typing import Literal
 
-from seleniumwire.thirdparty.mitmproxy import dns
-from seleniumwire.thirdparty.mitmproxy import flow as mflow
-from seleniumwire.thirdparty.mitmproxy.net.dns import response_codes
-from seleniumwire.thirdparty.mitmproxy.proxy import commands, events, layer
-from seleniumwire.thirdparty.mitmproxy.proxy.context import Context
-from seleniumwire.thirdparty.mitmproxy.proxy.utils import expect
+from mitmproxy import dns
+from mitmproxy import flow as mflow
+from mitmproxy.net.dns import response_codes
+from mitmproxy.proxy import commands
+from mitmproxy.proxy import events
+from mitmproxy.proxy import layer
+from mitmproxy.proxy.context import Context
+from mitmproxy.proxy.utils import expect
 
 _LENGTH_LABEL = struct.Struct("!H")
 
@@ -106,8 +109,8 @@ class DNSLayer(layer.Layer):
             pack_message(servfail, flow.client_conn.transport_protocol),
         )
 
-    def unpack_message(self, data: bytes, from_client: bool) -> list[dns.DNSMessage]:
-        msgs: list[dns.DNSMessage] = []
+    def unpack_message(self, data: bytes, from_client: bool) -> List[dns.DNSMessage]:
+        msgs: List[dns.DNSMessage] = []
 
         buf = self.req_buf if from_client else self.resp_buf
 
@@ -148,7 +151,7 @@ class DNSLayer(layer.Layer):
         from_client = event.connection is self.context.client
 
         if isinstance(event, events.DataReceived):
-            msgs: list[dns.DNSMessage] = []
+            msgs: List[dns.DNSMessage] = []
             try:
                 msgs = self.unpack_message(event.data, from_client)
             except struct.error as e:

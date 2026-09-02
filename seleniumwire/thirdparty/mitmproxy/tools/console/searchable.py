@@ -1,6 +1,6 @@
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy.tools.console import signals
+from mitmproxy.tools.console import signals
 
 
 class Highlight(urwid.AttrMap):
@@ -84,5 +84,6 @@ class Searchable(urwid.ListBox):
                 self.set_focus(off, coming_from="above")
                 self.body._modified()
                 return
-        self.set_highlight(None)
-        signals.status_message.send(message="Search not found.", expire=1)
+        else:
+            self.set_highlight(None)
+            signals.status_message.send(message="Search not found.", expire=1)

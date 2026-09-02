@@ -1,6 +1,6 @@
 import logging
 
-from seleniumwire.thirdparty.mitmproxy import http
+from mitmproxy import http
 
 
 class ServerSideEvents:

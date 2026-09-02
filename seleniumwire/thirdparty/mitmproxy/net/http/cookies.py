@@ -3,7 +3,7 @@ import re
 import time
 from collections.abc import Iterable
 
-from seleniumwire.thirdparty.mitmproxy.coretypes import multidict
+from mitmproxy.coretypes import multidict
 
 """
 A flexible module for cookie parsing and manipulation.

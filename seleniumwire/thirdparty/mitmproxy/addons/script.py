@@ -8,23 +8,22 @@ import types
 from collections.abc import Sequence
 
 import mitmproxy.types as mtypes
-
-from seleniumwire.thirdparty.mitmproxy import (
-    addonmanager,
-    command,
-    ctx,
-    eventsequence,
-    exceptions,
-    flow,
-    hooks,
-)
-from seleniumwire.thirdparty.mitmproxy.utils import asyncio_utils
+from mitmproxy import addonmanager
+from mitmproxy import command
+from mitmproxy import ctx
+from mitmproxy import eventsequence
+from mitmproxy import exceptions
+from mitmproxy import flow
+from mitmproxy import hooks
+from mitmproxy.utils import asyncio_utils
 
 logger = logging.getLogger(__name__)
 
 
 def load_script(path: str) -> types.ModuleType | None:
-    fullname = f"__mitmproxy_script__.{os.path.splitext(os.path.basename(path))[0]}"
+    fullname = "__mitmproxy_script__.{}".format(
+        os.path.splitext(os.path.basename(path))[0]
+    )
     # the fullname is not unique among scripts, so if there already is an existing script with said
     # fullname, remove it.
     sys.modules.pop(fullname, None)
@@ -43,11 +42,11 @@ def load_script(path: str) -> types.ModuleType | None:
     except ImportError as e:
         if getattr(sys, "frozen", False):
             e.msg += (
-                ".\n"
-                "Note that mitmproxy's binaries include their own Python environment. "
-                "If your addon requires the installation of additional dependencies, "
-                "please install mitmproxy from PyPI "
-                "(https://docs.mitmproxy.org/stable/overview-installation/#installation-from-the-python-package-index-pypi)."
+                f".\n"
+                f"Note that mitmproxy's binaries include their own Python environment. "
+                f"If your addon requires the installation of additional dependencies, "
+                f"please install mitmproxy from PyPI "
+                f"(https://docs.mitmproxy.org/stable/overview-installation/#installation-from-the-python-package-index-pypi)."
             )
         script_error_handler(path, e)
         return None

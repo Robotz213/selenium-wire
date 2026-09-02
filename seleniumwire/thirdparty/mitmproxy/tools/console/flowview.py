@@ -1,21 +1,24 @@
 import sys
 from functools import lru_cache
 
+import urwid
+
 import mitmproxy.flow
 import mitmproxy.tools.console.master
 import mitmproxy_rs.syntax_highlight
-import urwid
-
-from seleniumwire.thirdparty.mitmproxy import contentviews, ctx, dns, http, tcp, udp
-from seleniumwire.thirdparty.mitmproxy.dns import DNSMessage
-from seleniumwire.thirdparty.mitmproxy.tools.console import (
-    common,
-    flowdetailview,
-    layoutwidget,
-    searchable,
-    tabs,
-)
-from seleniumwire.thirdparty.mitmproxy.utils import strutils
+from mitmproxy import contentviews
+from mitmproxy import ctx
+from mitmproxy import dns
+from mitmproxy import http
+from mitmproxy import tcp
+from mitmproxy import udp
+from mitmproxy.dns import DNSMessage
+from mitmproxy.tools.console import common
+from mitmproxy.tools.console import flowdetailview
+from mitmproxy.tools.console import layoutwidget
+from mitmproxy.tools.console import searchable
+from mitmproxy.tools.console import tabs
+from mitmproxy.utils import strutils
 
 
 class FlowViewHeader(urwid.WidgetWrap):

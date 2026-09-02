@@ -3,8 +3,10 @@ import re
 import textwrap
 from collections.abc import Iterable
 
-from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
-from seleniumwire.thirdparty.mitmproxy.utils import sliding_window, strutils
+from mitmproxy.contentviews._api import Contentview
+from mitmproxy.contentviews._api import Metadata
+from mitmproxy.utils import sliding_window
+from mitmproxy.utils import strutils
 
 """
 A custom XML/HTML prettifier. Compared to other prettifiers, its main features are:

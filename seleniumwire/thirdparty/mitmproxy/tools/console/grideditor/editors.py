@@ -2,16 +2,15 @@ from typing import Any
 
 import urwid
 
-from seleniumwire.thirdparty.mitmproxy import exceptions
-from seleniumwire.thirdparty.mitmproxy.http import Headers
-from seleniumwire.thirdparty.mitmproxy.tools.console import layoutwidget, signals
-from seleniumwire.thirdparty.mitmproxy.tools.console.grideditor import (
-    base,
-    col_bytes,
-    col_subgrid,
-    col_text,
-    col_viewany,
-)
+from mitmproxy import exceptions
+from mitmproxy.http import Headers
+from mitmproxy.tools.console import layoutwidget
+from mitmproxy.tools.console import signals
+from mitmproxy.tools.console.grideditor import base
+from mitmproxy.tools.console.grideditor import col_bytes
+from mitmproxy.tools.console.grideditor import col_subgrid
+from mitmproxy.tools.console.grideditor import col_text
+from mitmproxy.tools.console.grideditor import col_viewany
 
 
 class QueryEditor(base.FocusEditor):

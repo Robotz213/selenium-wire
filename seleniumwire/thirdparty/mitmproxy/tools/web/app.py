@@ -10,40 +10,44 @@ import os.path
 import re
 import secrets
 import sys
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Callable
+from collections.abc import Sequence
 from io import BytesIO
-from typing import Any, ClassVar, Concatenate, Literal
+from typing import Any
+from typing import Awaitable
+from typing import ClassVar
+from typing import Concatenate
+from typing import Literal
+from typing import Optional
 
-import mitmproxy.flow
-import mitmproxy.tools.web.master
-import mitmproxy_rs
 import tornado.escape
 import tornado.web
 import tornado.websocket
 
-from seleniumwire.thirdparty.mitmproxy import (
-    certs,
-    command,
-    contentviews,
-    flowfilter,
-    http,
-    io,
-    log,
-    optmanager,
-    version,
-)
-from seleniumwire.thirdparty.mitmproxy.dns import DNSFlow
-from seleniumwire.thirdparty.mitmproxy.http import HTTPFlow
-from seleniumwire.thirdparty.mitmproxy.tcp import TCPFlow, TCPMessage
-from seleniumwire.thirdparty.mitmproxy.tools.web.webaddons import WebAuth
-from seleniumwire.thirdparty.mitmproxy.udp import UDPFlow, UDPMessage
-from seleniumwire.thirdparty.mitmproxy.utils import asyncio_utils
-from seleniumwire.thirdparty.mitmproxy.utils.emoji import emoji
-from seleniumwire.thirdparty.mitmproxy.utils.strutils import (
-    always_str,
-    cut_after_n_lines,
-)
-from seleniumwire.thirdparty.mitmproxy.websocket import WebSocketMessage
+import mitmproxy.flow
+import mitmproxy.tools.web.master
+import mitmproxy_rs
+from mitmproxy import certs
+from mitmproxy import command
+from mitmproxy import contentviews
+from mitmproxy import flowfilter
+from mitmproxy import http
+from mitmproxy import io
+from mitmproxy import log
+from mitmproxy import optmanager
+from mitmproxy import version
+from mitmproxy.dns import DNSFlow
+from mitmproxy.http import HTTPFlow
+from mitmproxy.tcp import TCPFlow
+from mitmproxy.tcp import TCPMessage
+from mitmproxy.tools.web.webaddons import WebAuth
+from mitmproxy.udp import UDPFlow
+from mitmproxy.udp import UDPMessage
+from mitmproxy.utils import asyncio_utils
+from mitmproxy.utils.emoji import emoji
+from mitmproxy.utils.strutils import always_str
+from mitmproxy.utils.strutils import cut_after_n_lines
+from mitmproxy.websocket import WebSocketMessage
 
 # Fix for Windows systems where .js files may have text/plain MIME type in registry.
 # Modern browsers with ES6 module scripts require proper JavaScript MIME types.
@@ -376,7 +380,7 @@ class WebSocketEventBroadcaster(tornado.websocket.WebSocketHandler, AuthRequestH
     _send_queue: asyncio.Queue[bytes]
     _send_task: asyncio.Task[None]
 
-    def prepare(self) -> Awaitable[None] | None:
+    def prepare(self) -> Optional[Awaitable[None]]:
         token = self.xsrf_token  # https://github.com/tornadoweb/tornado/issues/645
         assert token
         return None
@@ -507,7 +511,7 @@ class DumpFlows(RequestHandler):
         try:
             match = flowfilter.parse(self.request.arguments["filter"][0].decode())
         except ValueError:  # thrown py flowfilter.parse if filter is invalid
-            raise APIError(400, "Invalid filter argument / regex")
+            raise APIError(400, f"Invalid filter argument / regex")
         except (
             KeyError,
             IndexError,
@@ -728,7 +732,7 @@ class FlowContentView(RequestHandler):
             elif isinstance(flow, (TCPFlow, UDPFlow)):
                 messages = flow.messages
             else:
-                raise APIError(400, "This flow has no messages.")
+                raise APIError(400, f"This flow has no messages.")
             msgs = []
             for m in messages:
                 d = self.message_to_json(

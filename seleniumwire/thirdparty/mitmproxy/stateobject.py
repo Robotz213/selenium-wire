@@ -46,7 +46,7 @@ class StateObject(serializable.Serializable):
                 else:
                     setattr(self, attr, make_object(cls, val))
         if state:
-            raise RuntimeWarning(f"Unexpected State in __setstate__: {state}")
+            raise RuntimeWarning("Unexpected State in __setstate__: {}".format(state))
 
 
 def _process(typeinfo: typecheck.Type, val: typing.Any, make: bool) -> typing.Any:
@@ -65,12 +65,15 @@ def _process(typeinfo: typecheck.Type, val: typing.Any, make: bool) -> typing.An
     elif typename.startswith("typing.Tuple"):
         Ts = typecheck.tuple_types(typeinfo)
         if len(Ts) != len(val):
-            raise ValueError(f"Invalid data. Expected {Ts}, got {val}.")
-        return tuple(_process(T, x, make) for T, x in zip(Ts, val))
+            raise ValueError("Invalid data. Expected {}, got {}.".format(Ts, val))
+        return tuple(
+            _process(T, x, make) for T, x in zip(Ts, val)
+        )
     elif typename.startswith("typing.Dict"):
         k_cls, v_cls = typecheck.mapping_types(typeinfo)
         return {
-            _process(k_cls, k, make): _process(v_cls, v, make) for k, v in val.items()
+            _process(k_cls, k, make): _process(v_cls, v, make)
+            for k, v in val.items()
         }
     elif typename.startswith("typing.Any"):
         # This requires a bit of explanation. We can't import our IO layer here,

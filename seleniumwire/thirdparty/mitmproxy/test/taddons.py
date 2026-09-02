@@ -2,9 +2,11 @@ import asyncio
 
 import mitmproxy.master
 import mitmproxy.options
-
-from seleniumwire.thirdparty.mitmproxy import command, eventsequence, hooks
-from seleniumwire.thirdparty.mitmproxy.addons import core, script
+from mitmproxy import command
+from mitmproxy import eventsequence
+from mitmproxy import hooks
+from mitmproxy.addons import core
+from mitmproxy.addons import script
 
 
 class context:

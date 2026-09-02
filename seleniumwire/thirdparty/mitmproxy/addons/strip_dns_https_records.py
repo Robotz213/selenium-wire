@@ -1,5 +1,6 @@
-from seleniumwire.thirdparty.mitmproxy import ctx, dns
-from seleniumwire.thirdparty.mitmproxy.net.dns import types
+from mitmproxy import ctx
+from mitmproxy import dns
+from mitmproxy.net.dns import types
 
 
 class StripDnsHttpsRecords:

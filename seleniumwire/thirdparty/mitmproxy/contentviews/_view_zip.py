@@ -1,8 +1,9 @@
 import io
 import zipfile
 
-from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
-from seleniumwire.thirdparty.mitmproxy.contentviews._utils import yaml_dumps
+from mitmproxy.contentviews._api import Contentview
+from mitmproxy.contentviews._api import Metadata
+from mitmproxy.contentviews._utils import yaml_dumps
 
 
 class ZipContentview(Contentview):

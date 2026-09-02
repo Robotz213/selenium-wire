@@ -1,12 +1,12 @@
 """
 This module provides a @concurrent decorator primitive to
-offload computations from seleniumwire.thirdparty.mitmproxy's main master thread.
+offload computations from mitmproxy's main master thread.
 """
 
 import asyncio
 import inspect
 
-from seleniumwire.thirdparty.mitmproxy import hooks
+from mitmproxy import hooks
 
 
 def concurrent(fn):

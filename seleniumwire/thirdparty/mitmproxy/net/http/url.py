@@ -1,92 +1,104 @@
+from __future__ import annotations
+
 import re
 import urllib.parse
-from typing import AnyStr, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import AnyStr
+from typing import overload
 
-from seleniumwire.thirdparty.mitmproxy.net import check
+from mitmproxy.net import check
+from mitmproxy.net.check import is_valid_host
+from mitmproxy.net.check import is_valid_port
+from mitmproxy.utils.strutils import always_str
+
 # This regex extracts & splits the host header into host and port.
 # Handles the edge case of IPv6 addresses containing colons.
 # https://bugzilla.mozilla.org/show_bug.cgi?id=45891
-from seleniumwire.thirdparty.mitmproxy.net.check import is_valid_host, is_valid_port
-from seleniumwire.thirdparty.mitmproxy.utils.strutils import always_str
 
 _authority_re = re.compile(r"^(?P<host>[^:]+|\[.+\])(?::(?P<port>\d+))?$")
 
 
-def parse(url):
+def parse(url: str | bytes) -> tuple[bytes, bytes, int, bytes]:
     """
-        URL-parsing function that checks that
-            - port is an integer 0-65535
-            - host is a valid IDNA-encoded hostname with no null-bytes
-            - path is valid ASCII
+    URL-parsing function that checks that
+        - port is an integer 0-65535
+        - host is a valid IDNA-encoded hostname with no null-bytes
+        - path is valid ASCII
 
-        Args:
-            A URL (as bytes or as unicode)
+    Args:
+        A URL (as bytes or as unicode)
 
-        Returns:
-            A (scheme, host, port, path) tuple
+    Returns:
+        A (scheme, host, port, path) tuple
 
-        Raises:
-            ValueError, if the URL is not properly formatted.
+    Raises:
+        ValueError, if the URL is not properly formatted.
     """
     # FIXME: We shouldn't rely on urllib here.
 
     # Size of Ascii character after encoding is 1 byte which is same as its size
     # But non-Ascii character's size after encoding will be more than its size
-    def ascii_check(l):
-        if len(l) == len(str(l).encode()):
+    def ascii_check(x):
+        if len(x) == len(str(x).encode()):
             return True
         return False
 
     if isinstance(url, bytes):
         url = url.decode()
         if not ascii_check(url):
-            url = urllib.parse.urlsplit(url)
-            url = list(url)
-            url[3] = urllib.parse.quote(url[3])
-            url = urllib.parse.urlunsplit(url)
+            url = urllib.parse.urlsplit(url)  # type: ignore
+            url = list(url)  # type: ignore
+            url[3] = urllib.parse.quote(url[3])  # type: ignore
+            url = urllib.parse.urlunsplit(url)  # type: ignore
 
-    parsed = urllib.parse.urlparse(url)
+    parsed: urllib.parse.ParseResult = urllib.parse.urlparse(url)
     if not parsed.hostname:
         raise ValueError("No hostname given")
-
     else:
         host = parsed.hostname.encode("idna")
-        if isinstance(parsed, urllib.parse.ParseResult):
-            parsed = parsed.encode("ascii")
 
-    port = parsed.port  # Returns None if port number invalid in Py3.5. Will throw ValueError in Py3.6
+    parsed_b: urllib.parse.ParseResultBytes = parsed.encode("ascii")  # type: ignore
+
+    port = parsed_b.port
     if not port:
-        port = 443 if parsed.scheme == b"https" else 80
+        port = 443 if parsed_b.scheme == b"https" else 80
 
-    full_path = urllib.parse.urlunparse(
-        (b"", b"", parsed.path, parsed.params, parsed.query, parsed.fragment)
+    full_path: bytes = urllib.parse.urlunparse(
+        (b"", b"", parsed_b.path, parsed_b.params, parsed_b.query, parsed_b.fragment)  # type: ignore
     )
     if not full_path.startswith(b"/"):
-        full_path = b"/" + full_path
+        full_path = b"/" + full_path  # type: ignore
 
     if not check.is_valid_host(host):
         raise ValueError("Invalid Host")
 
-    return parsed.scheme, host, port, full_path
+    return parsed_b.scheme, host, port, full_path
 
 
-def unparse(scheme: str, host: str, port: int, path: str = "") -> str:
+@overload
+def unparse(scheme: str, host: str, port: int, path) -> str: ...
+
+
+@overload
+def unparse(scheme: bytes, host: bytes, port: int, path) -> bytes: ...
+
+
+def unparse(scheme, host, port, path):
     """
     Returns a URL string, constructed from the specified components.
-
-    Args:
-        All args must be str.
     """
-    if path == "*":
-        path = ""
     authority = hostport(scheme, host, port)
-    return f"{scheme}://{authority}{path}"
+
+    if isinstance(scheme, str):
+        return f"{scheme}://{authority}{path}"
+    else:
+        return b"%s://%s%s" % (scheme, authority, path)
 
 
-def encode(s: Sequence[Tuple[str, str]], similar_to: str = None) -> str:
+def encode(s: Sequence[tuple[str, str]], similar_to: str | None = None) -> str:
     """
-        Takes a list of (key, value) tuples and returns a urlencoded string.
-        If similar_to is passed, the output is formatted similar to the provided urlencoded string.
+    Takes a list of (key, value) tuples and returns a urlencoded string.
+    If similar_to is passed, the output is formatted similar to the provided urlencoded string.
     """
 
     remove_trailing_equal = False
@@ -97,7 +109,7 @@ def encode(s: Sequence[Tuple[str, str]], similar_to: str = None) -> str:
 
     if encoded and remove_trailing_equal:
         encoded = encoded.replace("=&", "&")
-        if encoded[-1] == '=':
+        if encoded[-1] == "=":
             encoded = encoded[:-1]
 
     return encoded
@@ -105,9 +117,9 @@ def encode(s: Sequence[Tuple[str, str]], similar_to: str = None) -> str:
 
 def decode(s):
     """
-        Takes a urlencoded string and returns a list of surrogate-escaped (key, value) tuples.
+    Takes a urlencoded string and returns a list of surrogate-escaped (key, value) tuples.
     """
-    return urllib.parse.parse_qsl(s, keep_blank_values=True, errors='surrogateescape')
+    return urllib.parse.parse_qsl(s, keep_blank_values=True, errors="surrogateescape")
 
 
 def quote(b: str, safe: str = "/") -> str:
@@ -130,7 +142,7 @@ def unquote(s: str) -> str:
 
 def hostport(scheme: AnyStr, host: AnyStr, port: int) -> AnyStr:
     """
-        Returns the host component, with a port specification if needed.
+    Returns the host component, with a port specification if needed.
     """
     if default_port(scheme) == port:
         return host
@@ -141,7 +153,7 @@ def hostport(scheme: AnyStr, host: AnyStr, port: int) -> AnyStr:
             return "%s:%d" % (host, port)
 
 
-def default_port(scheme: AnyStr) -> Optional[int]:
+def default_port(scheme: AnyStr) -> int | None:
     return {
         "http": 80,
         b"http": 80,
@@ -150,7 +162,7 @@ def default_port(scheme: AnyStr) -> Optional[int]:
     }.get(scheme, None)
 
 
-def parse_authority(authority: AnyStr, check: bool) -> Tuple[str, Optional[int]]:
+def parse_authority(authority: AnyStr, check: bool) -> tuple[str, int | None]:
     """Extract the host and port from host header/authority information
 
     Raises:
@@ -158,14 +170,16 @@ def parse_authority(authority: AnyStr, check: bool) -> Tuple[str, Optional[int]]
     """
     try:
         if isinstance(authority, bytes):
-            authority_str = authority.decode("idna")
+            m = _authority_re.match(authority.decode("utf-8"))
+            if not m:
+                raise ValueError
+            host = m["host"].encode("utf-8").decode("idna")
         else:
-            authority_str = authority
-        m = _authority_re.match(authority_str)
-        if not m:
-            raise ValueError
+            m = _authority_re.match(authority)
+            if not m:
+                raise ValueError
+            host = m.group("host")
 
-        host = m.group("host")
         if host.startswith("[") and host.endswith("]"):
             host = host[1:-1]
         if not is_valid_host(host):

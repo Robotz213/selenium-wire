@@ -27,14 +27,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
-import logging
 import xml.dom.minidom
+import logging
 
-from .ASWBXMLByteQueue import ASWBXMLByteQueue
 from .ASWBXMLCodePage import ASWBXMLCodePage
+from .ASWBXMLByteQueue import ASWBXMLByteQueue
 from .GlobalTokens import GlobalTokens
 from .InvalidDataException import InvalidDataException
-
 
 class ASWBXML:
 	versionByte = 0x03
@@ -890,7 +889,7 @@ class ASWBXML:
 
 				strTag = self.codePages[self.currentCodePage].getTag(token)
 				if (strTag == None):
-					strTag = "UNKNOWN_TAG_{0,2:X}".format()
+					strTag = "UNKNOWN_TAG_{0,2:X}".format(token)
 
 				newNode = self.xmlDoc.createElement(strTag)
 				# not sure if this should be set on every node or not

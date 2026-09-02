@@ -1,40 +1,40 @@
 import codecs
 import io
 import re
-from typing import Iterable, Union, overload
+from collections.abc import Iterable
+from typing import overload
 
 # https://mypy.readthedocs.io/en/stable/more_types.html#function-overloading
 
-@overload
-def always_bytes(str_or_bytes: None, *encode_args) -> None:
-    ...
-
 
 @overload
-def always_bytes(str_or_bytes: Union[str, bytes], *encode_args) -> bytes:
-    ...
+def always_bytes(str_or_bytes: None, *encode_args) -> None: ...
 
 
-def always_bytes(str_or_bytes: Union[None, str, bytes], *encode_args) -> Union[None, bytes]:
+@overload
+def always_bytes(str_or_bytes: str | bytes, *encode_args) -> bytes: ...
+
+
+def always_bytes(str_or_bytes: None | str | bytes, *encode_args) -> None | bytes:
     if str_or_bytes is None or isinstance(str_or_bytes, bytes):
         return str_or_bytes
     elif isinstance(str_or_bytes, str):
         return str_or_bytes.encode(*encode_args)
     else:
-        raise TypeError("Expected str or bytes, but got {}.".format(type(str_or_bytes).__name__))
+        raise TypeError(
+            f"Expected str or bytes, but got {type(str_or_bytes).__name__}."
+        )
 
 
 @overload
-def always_str(str_or_bytes: None, *encode_args) -> None:
-    ...
+def always_str(str_or_bytes: None, *encode_args) -> None: ...
 
 
 @overload
-def always_str(str_or_bytes: Union[str, bytes], *encode_args) -> str:
-    ...
+def always_str(str_or_bytes: str | bytes, *encode_args) -> str: ...
 
 
-def always_str(str_or_bytes: Union[None, str, bytes], *decode_args) -> Union[None, str]:
+def always_str(str_or_bytes: None | str | bytes, *decode_args) -> None | str:
     """
     Returns,
         str_or_bytes unmodified, if
@@ -44,7 +44,9 @@ def always_str(str_or_bytes: Union[None, str, bytes], *decode_args) -> Union[Non
     elif isinstance(str_or_bytes, bytes):
         return str_or_bytes.decode(*decode_args)
     else:
-        raise TypeError("Expected str or bytes, but got {}.".format(type(str_or_bytes).__name__))
+        raise TypeError(
+            f"Expected str or bytes, but got {type(str_or_bytes).__name__}."
+        )
 
 
 # Translate control characters to "safe" characters. This implementation
@@ -52,8 +54,8 @@ def always_str(str_or_bytes: Union[None, str, bytes], *decode_args) -> Union[Non
 # (http://unicode.org/charts/PDF/U2400.pdf), but that turned out to render badly
 # with monospace fonts. We are back to "." therefore.
 _control_char_trans = {
-    x: ord(".")  # x + 0x2400 for unicode control group pictures
-    for x in range(32)
+    x: ord(".")
+    for x in range(32)  # x + 0x2400 for unicode control group pictures
 }
 _control_char_trans[127] = ord(".")  # 0x2421
 _control_char_trans_newline = _control_char_trans.copy()
@@ -72,13 +74,15 @@ def escape_control_characters(text: str, keep_spacing=True) -> str:
         keep_spacing: If True, tabs and newlines will not be replaced.
     """
     if not isinstance(text, str):
-        raise ValueError("text type must be unicode but is {}".format(type(text).__name__))
+        raise ValueError(f"text type must be unicode but is {type(text).__name__}")
 
     trans = _control_char_trans_newline if keep_spacing else _control_char_trans
     return text.translate(trans)
 
 
-def bytes_to_escaped_str(data, keep_spacing=False, escape_single_quotes=False):
+def bytes_to_escaped_str(
+    data: bytes, keep_spacing: bool = False, escape_single_quotes: bool = False
+) -> str:
     """
     Take bytes and return a safe string that can be displayed to the user.
 
@@ -91,7 +95,7 @@ def bytes_to_escaped_str(data, keep_spacing=False, escape_single_quotes=False):
     """
 
     if not isinstance(data, bytes):
-        raise ValueError("data must be bytes, but is {}".format(data.__class__.__name__))
+        raise ValueError(f"data must be bytes, but is {data.__class__.__name__}")
     # We always insert a double-quote here so that we get a single-quoted string back
     # https://stackoverflow.com/questions/29019340/why-does-python-use-different-quotes-for-representing-strings-depending-on-their
     ret = repr(b'"' + data).lstrip("b")[2:-1]
@@ -101,12 +105,12 @@ def bytes_to_escaped_str(data, keep_spacing=False, escape_single_quotes=False):
         ret = re.sub(
             r"(?<!\\)(\\\\)*\\([nrt])",
             lambda m: (m.group(1) or "") + dict(n="\n", r="\r", t="\t")[m.group(2)],
-            ret
+            ret,
         )
     return ret
 
 
-def escaped_str_to_bytes(data):
+def escaped_str_to_bytes(data: str) -> bytes:
     """
     Take an escaped string and return the unescaped bytes equivalent.
 
@@ -114,33 +118,66 @@ def escaped_str_to_bytes(data):
         ValueError, if the escape sequence is invalid.
     """
     if not isinstance(data, str):
-        raise ValueError("data must be str, but is {}".format(data.__class__.__name__))
+        raise ValueError(f"data must be str, but is {data.__class__.__name__}")
 
     # This one is difficult - we use an undocumented Python API here
     # as per http://stackoverflow.com/a/23151714/934719
-    return codecs.escape_decode(data)[0]
+    return codecs.escape_decode(data)[0]  # type: ignore
 
 
 def is_mostly_bin(s: bytes) -> bool:
-    if not s or len(s) == 0:
+    if not s:
         return False
 
-    return sum(
-        i < 9 or 13 < i < 32 or 126 < i
-        for i in s[:100]
-    ) / len(s[:100]) > 0.3
+    # Cut off at ~100 chars, but do it smartly so that if the input is UTF-8, we don't
+    # chop a multibyte code point in half.
+    if len(s) > 100:
+        for cut in range(100, min(104, len(s))):
+            is_continuation_byte = (s[cut] >> 6) == 0b10
+            if not is_continuation_byte:
+                # A new character starts here, so we cut off just before that.
+                s = s[:cut]
+                break
+        else:
+            s = s[:100]
+
+    low_bytes = sum(i < 9 or 13 < i < 32 for i in s)
+    high_bytes = sum(i > 126 for i in s)
+    ascii_bytes = len(s) - low_bytes - high_bytes
+
+    # Heuristic 1: If it's mostly printable ASCII, it's not bin.
+    if ascii_bytes / len(s) > 0.7:
+        return False
+
+    # Heuristic 2: If it's UTF-8 without too many ASCII control chars, it's not bin.
+    # Note that b"\x00\x00\x00" would be valid UTF-8, so we don't want to accept _any_
+    # UTF-8 with higher code points.
+    if (ascii_bytes + high_bytes) / len(s) > 0.95:
+        try:
+            s.decode()
+            return False
+        except ValueError:
+            pass
+
+    return True
 
 
 def is_xml(s: bytes) -> bool:
-    return s.strip().startswith(b"<")
+    # XML 1.0 §2.3 defines whitespace as (#x20 | #x9 | #xD | #xA), so a
+    # leading \r before "<" should also be skipped here.
+    for char in s:
+        if char in (9, 10, 13, 32):  # is whitespace?
+            continue
+        return char == 60  # is a "<"?
+    return False
 
 
 def clean_hanging_newline(t):
     """
-        Many editors will silently add a newline to the final line of a
-        document (I'm looking at you, Vim). This function fixes this common
-        problem at the risk of removing a hanging newline in the rare cases
-        where the user actually intends it.
+    Many editors will silently add a newline to the final line of a
+    document (I'm looking at you, Vim). This function fixes this common
+    problem at the risk of removing a hanging newline in the rare cases
+    where the user actually intends it.
     """
     if t and t[-1] == "\n":
         return t[:-1]
@@ -149,18 +186,19 @@ def clean_hanging_newline(t):
 
 def hexdump(s):
     """
-        Returns:
-            A generator of (offset, hex, str) tuples
+    Returns:
+        A generator of (offset, hex, str) tuples
     """
     for i in range(0, len(s), 16):
-        offset = "{:0=10x}".format(i)
-        part = s[i:i + 16]
-        x = " ".join("{:0=2x}".format(i) for i in part)
+        offset = f"{i:0=10x}"
+        part = s[i : i + 16]
+        x = " ".join(f"{i:0=2x}" for i in part)
         x = x.ljust(47)  # 16*2 + 15
-        part_repr = always_str(escape_control_characters(
-            part.decode("ascii", "replace").replace(u"\ufffd", u"."),
-            False
-        ))
+        part_repr = always_str(
+            escape_control_characters(
+                part.decode("ascii", "replace").replace("\ufffd", "."), False
+            )
+        )
         yield (offset, x, part_repr)
 
 
@@ -179,8 +217,8 @@ MULTILINE_CONTENT_LINE_CONTINUATION = r"(?:.|(?<=\\)\n)*?"
 
 
 def split_special_areas(
-        data: str,
-        area_delimiter: Iterable[str],
+    data: str,
+    area_delimiter: Iterable[str],
 ):
     """
     Split a string of code into a [code, special area, code, special area, ..., code] list.
@@ -194,17 +232,13 @@ def split_special_areas(
 
     "".join(split_special_areas(x, ...)) == x always holds true.
     """
-    return re.split(
-        "({})".format("|".join(area_delimiter)),
-        data,
-        flags=re.MULTILINE
-    )
+    return re.split("({})".format("|".join(area_delimiter)), data, flags=re.MULTILINE)
 
 
 def escape_special_areas(
-        data: str,
-        area_delimiter: Iterable[str],
-        control_characters,
+    data: str,
+    area_delimiter: Iterable[str],
+    control_characters,
 ):
     """
     Escape all control characters present in special areas with UTF8 symbols
@@ -229,7 +263,7 @@ def escape_special_areas(
     """
     buf = io.StringIO()
     parts = split_special_areas(data, area_delimiter)
-    rex = re.compile(r"[{}]".format(control_characters))
+    rex = re.compile(rf"[{control_characters}]")
     for i, x in enumerate(parts):
         if i % 2:
             x = rex.sub(_move_to_private_code_plane, x)
@@ -244,3 +278,14 @@ def unescape_special_areas(data: str):
     x == unescape_special_areas(escape_special_areas(x)) always holds true.
     """
     return re.sub(r"[\ue000-\ue0ff]", _restore_from_private_code_plane, data)
+
+
+def cut_after_n_lines(content: str, n: int) -> str:
+    assert n > 0
+    pos = content.find("\n")
+    while pos >= 0 and n > 1:
+        pos = content.find("\n", pos + 1)
+        n -= 1
+    if pos >= 0:
+        content = content[: pos + 1]
+    return content

@@ -1,21 +1,29 @@
 """
-    This module manages and invokes typed commands.
+This module manages and invokes typed commands.
 """
+
 import functools
 import inspect
+import logging
 import sys
 import textwrap
 import types
-import typing
+from collections.abc import Callable
+from collections.abc import Iterable
+from collections.abc import Sequence
+from typing import Any
+from typing import NamedTuple
 
-import seleniumwire.thirdparty.mitmproxy.types
-from seleniumwire.thirdparty.mitmproxy import exceptions
-from seleniumwire.thirdparty.mitmproxy import command_lexer
-from seleniumwire.thirdparty.mitmproxy.command_lexer import unquote
+import pyparsing
+
+import mitmproxy.types
+from mitmproxy import command_lexer
+from mitmproxy import exceptions
+from mitmproxy.command_lexer import unquote
 
 
-def verify_arg_signature(f: typing.Callable, args: typing.Iterable[typing.Any], kwargs: dict) -> None:
-    sig = inspect.signature(f)
+def verify_arg_signature(f: Callable, args: Iterable[Any], kwargs: dict) -> None:
+    sig = inspect.signature(f, eval_str=True)
     try:
         sig.bind(*args, **kwargs)
     except TypeError as v:
@@ -24,25 +32,27 @@ def verify_arg_signature(f: typing.Callable, args: typing.Iterable[typing.Any], 
 
 def typename(t: type) -> str:
     """
-        Translates a type to an explanatory string.
+    Translates a type to an explanatory string.
     """
     if t == inspect._empty:  # type: ignore
         raise exceptions.CommandError("missing type annotation")
-    to = seleniumwire.thirdparty.mitmproxy.types.CommandTypes.get(t, None)
+    to = mitmproxy.types.CommandTypes.get(t, None)
     if not to:
-        raise exceptions.CommandError("unsupported type: %s" % getattr(t, "__name__", t))
+        raise exceptions.CommandError(
+            "unsupported type: %s" % getattr(t, "__name__", t)
+        )
     return to.display
 
 
-def _empty_as_none(x: typing.Any) -> typing.Any:
+def _empty_as_none(x: Any) -> Any:
     if x == inspect.Signature.empty:
         return None
     return x
 
 
-class CommandParameter(typing.NamedTuple):
+class CommandParameter(NamedTuple):
     name: str
-    type: typing.Type
+    type: type
     kind: inspect._ParameterKind = inspect.Parameter.POSITIONAL_OR_KEYWORD
 
     def __str__(self):
@@ -56,13 +66,13 @@ class Command:
     name: str
     manager: "CommandManager"
     signature: inspect.Signature
-    help: typing.Optional[str]
+    help: str | None
 
-    def __init__(self, manager: "CommandManager", name: str, func: typing.Callable) -> None:
+    def __init__(self, manager: "CommandManager", name: str, func: Callable) -> None:
         self.name = name
         self.manager = manager
         self.func = func
-        self.signature = inspect.signature(self.func)
+        self.signature = inspect.signature(self.func, eval_str=True)
 
         if func.__doc__:
             txt = func.__doc__.strip()
@@ -73,17 +83,23 @@ class Command:
         # This fails with a CommandException if types are invalid
         for name, parameter in self.signature.parameters.items():
             t = parameter.annotation
-            if not seleniumwire.thirdparty.mitmproxy.types.CommandTypes.get(parameter.annotation, None):
-                raise exceptions.CommandError(f"Argument {name} has an unknown type ({_empty_as_none(t)}) in {func}.")
-        if self.return_type and not seleniumwire.thirdparty.mitmproxy.types.CommandTypes.get(self.return_type, None):
-            raise exceptions.CommandError(f"Return type has an unknown type ({self.return_type}) in {func}.")
+            if not mitmproxy.types.CommandTypes.get(parameter.annotation, None):
+                raise exceptions.CommandError(
+                    f"Argument {name} has an unknown type {t} in {func}."
+                )
+        if self.return_type and not mitmproxy.types.CommandTypes.get(
+            self.return_type, None
+        ):
+            raise exceptions.CommandError(
+                f"Return type has an unknown type ({self.return_type}) in {func}."
+            )
 
     @property
-    def return_type(self) -> typing.Optional[typing.Type]:
+    def return_type(self) -> type | None:
         return _empty_as_none(self.signature.return_annotation)
 
     @property
-    def parameters(self) -> typing.List[CommandParameter]:
+    def parameters(self) -> list[CommandParameter]:
         """Returns a list of CommandParameters."""
         ret = []
         for name, param in self.signature.parameters.items():
@@ -98,23 +114,33 @@ class Command:
             ret = ""
         return f"{self.name} {params}{ret}"
 
-    def prepare_args(self, args: typing.Sequence[str]) -> inspect.BoundArguments:
+    def prepare_args(self, args: Sequence[str]) -> inspect.BoundArguments:
         try:
             bound_arguments = self.signature.bind(*args)
         except TypeError:
-            expected = f'Expected: {str(self.signature.parameters)}'
-            received = f'Received: {str(args)}'
-            raise exceptions.CommandError(f"Command argument mismatch: \n    {expected}\n    {received}")
+            expected = f"Expected: {self.signature.parameters}"
+            received = f"Received: {args}"
+            raise exceptions.CommandError(
+                f"Command argument mismatch: \n    {expected}\n    {received}"
+            )
 
         for name, value in bound_arguments.arguments.items():
-            convert_to = self.signature.parameters[name].annotation
-            bound_arguments.arguments[name] = parsearg(self.manager, value, convert_to)
+            param = self.signature.parameters[name]
+            convert_to = param.annotation
+            if param.kind == param.VAR_POSITIONAL:
+                bound_arguments.arguments[name] = tuple(
+                    parsearg(self.manager, x, convert_to) for x in value
+                )
+            else:
+                bound_arguments.arguments[name] = parsearg(
+                    self.manager, value, convert_to
+                )
 
         bound_arguments.apply_defaults()
 
         return bound_arguments
 
-    def call(self, args: typing.Sequence[str]) -> typing.Any:
+    def call(self, args: Sequence[str]) -> Any:
         """
         Call the command with a list of arguments. At this point, all
         arguments are strings.
@@ -123,7 +149,7 @@ class Command:
         ret = self.func(*bound_args.args, **bound_args.kwargs)
         if ret is None and self.return_type is None:
             return
-        typ = seleniumwire.thirdparty.mitmproxy.types.CommandTypes.get(self.return_type)
+        typ = mitmproxy.types.CommandTypes.get(self.return_type)
         assert typ
         if not typ.is_valid(self.manager, typ, ret):
             raise exceptions.CommandError(
@@ -132,14 +158,14 @@ class Command:
         return ret
 
 
-class ParseResult(typing.NamedTuple):
+class ParseResult(NamedTuple):
     value: str
-    type: typing.Type
+    type: type
     valid: bool
 
 
 class CommandManager:
-    commands: typing.Dict[str, Command]
+    commands: dict[str, Command]
 
     def __init__(self, master):
         self.master = master
@@ -159,36 +185,37 @@ class CommandManager:
                         try:
                             self.add(o.command_name, o)
                         except exceptions.CommandError as e:
-                            self.master.log.warn(
-                                "Could not load command %s: %s" % (o.command_name, e)
+                            logging.warning(
+                                f"Could not load command {o.command_name}: {e}"
                             )
 
-    def add(self, path: str, func: typing.Callable):
+    def add(self, path: str, func: Callable):
         self.commands[path] = Command(self, path, func)
 
     @functools.lru_cache(maxsize=128)
     def parse_partial(
-            self,
-            cmdstr: str
-    ) -> typing.Tuple[typing.Sequence[ParseResult], typing.Sequence[CommandParameter]]:
+        self, cmdstr: str
+    ) -> tuple[Sequence[ParseResult], Sequence[CommandParameter]]:
         """
         Parse a possibly partial command. Return a sequence of ParseResults and a sequence of remainder type help items.
         """
 
-        parts: typing.List[str] = command_lexer.expr.parseString(cmdstr, parseAll=True)
+        parts: pyparsing.ParseResults = command_lexer.expr.parse_string(
+            cmdstr, parse_all=True
+        )
 
-        parsed: typing.List[ParseResult] = []
-        next_params: typing.List[CommandParameter] = [
-            CommandParameter("", seleniumwire.thirdparty.mitmproxy.types.Cmd),
-            CommandParameter("", seleniumwire.thirdparty.mitmproxy.types.CmdArgs),
+        parsed: list[ParseResult] = []
+        next_params: list[CommandParameter] = [
+            CommandParameter("", mitmproxy.types.Cmd),
+            CommandParameter("", mitmproxy.types.CmdArgs),
         ]
-        expected: typing.Optional[CommandParameter] = None
+        expected: CommandParameter | None = None
         for part in parts:
             if part.isspace():
                 parsed.append(
                     ParseResult(
                         value=part,
-                        type=seleniumwire.thirdparty.mitmproxy.types.Space,
+                        type=mitmproxy.types.Space,
                         valid=True,
                     )
                 )
@@ -199,28 +226,28 @@ class CommandManager:
             elif next_params:
                 expected = next_params.pop(0)
             else:
-                expected = CommandParameter("", seleniumwire.thirdparty.mitmproxy.types.Unknown)
+                expected = CommandParameter("", mitmproxy.types.Unknown)
 
             arg_is_known_command = (
-                expected.type == seleniumwire.thirdparty.mitmproxy.types.Cmd and part in self.commands
+                expected.type == mitmproxy.types.Cmd and part in self.commands
             )
             arg_is_unknown_command = (
-                expected.type == seleniumwire.thirdparty.mitmproxy.types.Cmd and part not in self.commands
+                expected.type == mitmproxy.types.Cmd and part not in self.commands
             )
             command_args_following = (
-                next_params and next_params[0].type == seleniumwire.thirdparty.mitmproxy.types.CmdArgs
+                next_params and next_params[0].type == mitmproxy.types.CmdArgs
             )
             if arg_is_known_command and command_args_following:
                 next_params = self.commands[part].parameters + next_params[1:]
             if arg_is_unknown_command and command_args_following:
                 next_params.pop(0)
 
-            to = seleniumwire.thirdparty.mitmproxy.types.CommandTypes.get(expected.type, None)
+            to = mitmproxy.types.CommandTypes.get(expected.type, None)
             valid = False
             if to:
                 try:
                     to.parse(self, expected.type, part)
-                except exceptions.TypeError:
+                except ValueError:
                     valid = False
                 else:
                     valid = True
@@ -235,7 +262,7 @@ class CommandManager:
 
         return parsed, next_params
 
-    def call(self, command_name: str, *args: typing.Sequence[typing.Any]) -> typing.Any:
+    def call(self, command_name: str, *args: Any) -> Any:
         """
         Call a command with native arguments. May raise CommandError.
         """
@@ -243,7 +270,7 @@ class CommandManager:
             raise exceptions.CommandError("Unknown command: %s" % command_name)
         return self.commands[command_name].func(*args)
 
-    def call_strings(self, command_name: str, args: typing.Sequence[str]) -> typing.Any:
+    def call_strings(self, command_name: str, args: Sequence[str]) -> Any:
         """
         Call a command using a list of string arguments. May raise CommandError.
         """
@@ -252,18 +279,16 @@ class CommandManager:
 
         return self.commands[command_name].call(args)
 
-    def execute(self, cmdstr: str) -> typing.Any:
+    def execute(self, cmdstr: str) -> Any:
         """
         Execute a command string. May raise CommandError.
         """
         parts, _ = self.parse_partial(cmdstr)
         if not parts:
             raise exceptions.CommandError(f"Invalid command: {cmdstr!r}")
-        command_name, *args = [
-            unquote(part.value)
-            for part in parts
-            if part.type != seleniumwire.thirdparty.mitmproxy.types.Space
-        ]
+        command_name, *args = (
+            unquote(part.value) for part in parts if part.type != mitmproxy.types.Space
+        )
         return self.call_strings(command_name, args)
 
     def dump(self, out=sys.stdout) -> None:
@@ -276,20 +301,20 @@ class CommandManager:
             print(file=out)
 
 
-def parsearg(manager: CommandManager, spec: str, argtype: type) -> typing.Any:
+def parsearg(manager: CommandManager, spec: str, argtype: type) -> Any:
     """
-        Convert a string to a argument to the appropriate type.
+    Convert a string to a argument to the appropriate type.
     """
-    t = seleniumwire.thirdparty.mitmproxy.types.CommandTypes.get(argtype, None)
+    t = mitmproxy.types.CommandTypes.get(argtype, None)
     if not t:
         raise exceptions.CommandError(f"Unsupported argument type: {argtype}")
     try:
         return t.parse(manager, argtype, spec)
-    except exceptions.TypeError as e:
+    except ValueError as e:
         raise exceptions.CommandError(str(e)) from e
 
 
-def command(name: typing.Optional[str] = None):
+def command(name: str | None = None):
     def decorator(function):
         @functools.wraps(function)
         def wrapper(*args, **kwargs):
@@ -304,9 +329,9 @@ def command(name: typing.Optional[str] = None):
 
 def argument(name, type):
     """
-        Set the type of a command argument at runtime. This is useful for more
-        specific types such as seleniumwire.thirdparty.mitmproxy.types.Choice, which we cannot annotate
-        directly as mypy does not like that.
+    Set the type of a command argument at runtime. This is useful for more
+    specific types such as mitmproxy.types.Choice, which we cannot annotate
+    directly as mypy does not like that.
     """
 
     def decorator(f: types.FunctionType) -> types.FunctionType:

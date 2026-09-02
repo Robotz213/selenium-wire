@@ -4,10 +4,10 @@ import sys
 
 def lookup(address, port, s):
     """
-        Parse the pfctl state output s, to look up the destination host
-        matching the client (address, port).
+    Parse the pfctl state output s, to look up the destination host
+    matching the client (address, port).
 
-        Returns an (address, port) tuple, or None.
+    Returns an (address, port) tuple, or None.
     """
     # We may get an ipv4-mapped ipv6 address here, e.g. ::ffff:127.0.0.1.
     # Those still appear as "127.0.0.1" in the table, so we need to strip the prefix.
@@ -15,10 +15,10 @@ def lookup(address, port, s):
     s = s.decode()
 
     # ALL tcp 192.168.1.13:57474 -> 23.205.82.58:443       ESTABLISHED:ESTABLISHED
-    specv4 = "%s:%s" % (address, port)
+    specv4 = f"{address}:{port}"
 
     # ALL tcp 2a01:e35:8bae:50f0:9d9b:ef0d:2de3:b733[58505] -> 2606:4700:30::681f:4ad0[443]       ESTABLISHED:ESTABLISHED
-    specv6 = "%s[%s]" % (address, port)
+    specv6 = f"{address}[{port}]"
 
     for i in s.split("\n"):
         if "ESTABLISHED:ESTABLISHED" in i and specv4 in i:

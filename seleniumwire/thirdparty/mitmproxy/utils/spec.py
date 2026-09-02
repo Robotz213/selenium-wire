@@ -1,4 +1,4 @@
-from mitmproxy import flowfilter
+from seleniumwire.thirdparty.mitmproxy import flowfilter
 
 
 def parse_spec(option: str) -> tuple[flowfilter.TFilter, str, str]:

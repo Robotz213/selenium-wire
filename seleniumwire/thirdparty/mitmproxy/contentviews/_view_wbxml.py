@@ -1,6 +1,5 @@
-from mitmproxy.contentviews._api import Contentview
-from mitmproxy.contentviews._api import Metadata
-from mitmproxy.contrib.wbxml import ASCommandResponse
+from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
+from seleniumwire.thirdparty.mitmproxy.contrib.wbxml import ASCommandResponse
 
 
 class WBXMLContentview(Contentview):

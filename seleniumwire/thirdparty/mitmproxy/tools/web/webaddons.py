@@ -9,12 +9,13 @@ from typing import TYPE_CHECKING
 
 import argon2
 
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy.tools.web.web_columns import AVAILABLE_WEB_COLUMNS
+from seleniumwire.thirdparty.mitmproxy import ctx, exceptions
+from seleniumwire.thirdparty.mitmproxy.tools.web.web_columns import (
+    AVAILABLE_WEB_COLUMNS,
+)
 
 if TYPE_CHECKING:
-    from mitmproxy.tools.web.master import WebMaster
+    from seleniumwire.thirdparty.mitmproxy.tools.web.master import WebMaster
 
 logger = logging.getLogger(__name__)
 
@@ -115,8 +116,8 @@ class WebAddon:
                 )
             if not success and not ctx.options.web_password:
                 logger.info(
-                    f"You can configure a fixed authentication token by setting the `web_password` option "
-                    f"(https://docs.mitmproxy.org/stable/concepts-options/#web_password).",
+                    "You can configure a fixed authentication token by setting the `web_password` option "
+                    "(https://docs.mitmproxy.org/stable/concepts-options/#web_password).",
                 )
 
 

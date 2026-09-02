@@ -1,8 +1,7 @@
 import time
 
-from mitmproxy import connection
-from mitmproxy import flow
-from mitmproxy.coretypes import serializable
+from seleniumwire.thirdparty.mitmproxy import connection, flow
+from seleniumwire.thirdparty.mitmproxy.coretypes import serializable
 
 
 class UDPMessage(serializable.Serializable):

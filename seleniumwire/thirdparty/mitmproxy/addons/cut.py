@@ -5,15 +5,11 @@ import os.path
 from collections.abc import Sequence
 from typing import Any
 
+import mitmproxy.types
 import pyperclip
 
-import mitmproxy.types
-from mitmproxy import certs
-from mitmproxy import command
-from mitmproxy import exceptions
-from mitmproxy import flow
-from mitmproxy import http
-from mitmproxy.log import ALERT
+from seleniumwire.thirdparty.mitmproxy import certs, command, exceptions, flow, http
+from seleniumwire.thirdparty.mitmproxy.log import ALERT
 
 logger = logging.getLogger(__name__)
 

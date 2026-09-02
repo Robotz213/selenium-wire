@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
-from mitmproxy import connection
-from mitmproxy.options import Options
+from seleniumwire.thirdparty.mitmproxy import connection
+from seleniumwire.thirdparty.mitmproxy.options import Options
 
 if TYPE_CHECKING:
     import mitmproxy.proxy.layer

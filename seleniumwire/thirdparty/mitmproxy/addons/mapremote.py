@@ -2,11 +2,8 @@ import re
 from collections.abc import Sequence
 from typing import NamedTuple
 
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy import flowfilter
-from mitmproxy import http
-from mitmproxy.utils.spec import parse_spec
+from seleniumwire.thirdparty.mitmproxy import ctx, exceptions, flowfilter, http
+from seleniumwire.thirdparty.mitmproxy.utils.spec import parse_spec
 
 
 class MapRemoteSpec(NamedTuple):

@@ -8,16 +8,12 @@ import wsproto.utilities
 from wsproto import ConnectionState
 from wsproto.frame_protocol import Opcode
 
-from mitmproxy import connection
-from mitmproxy import http
-from mitmproxy import websocket
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy.commands import StartHook
-from mitmproxy.proxy.context import Context
-from mitmproxy.proxy.events import MessageInjected
-from mitmproxy.proxy.utils import expect
+from seleniumwire.thirdparty.mitmproxy import connection, http, websocket
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, events, layer
+from seleniumwire.thirdparty.mitmproxy.proxy.commands import StartHook
+from seleniumwire.thirdparty.mitmproxy.proxy.context import Context
+from seleniumwire.thirdparty.mitmproxy.proxy.events import MessageInjected
+from seleniumwire.thirdparty.mitmproxy.proxy.utils import expect
 
 
 @dataclass

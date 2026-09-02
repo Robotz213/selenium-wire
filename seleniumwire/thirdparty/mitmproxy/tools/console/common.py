@@ -5,17 +5,14 @@ from collections.abc import Iterable
 from functools import lru_cache
 
 import urwid.util
-from publicsuffix2 import get_sld
-from publicsuffix2 import get_tld
+from publicsuffix2 import get_sld, get_tld
 
-from mitmproxy import dns
-from mitmproxy import flow
-from mitmproxy.dns import DNSFlow
-from mitmproxy.http import HTTPFlow
-from mitmproxy.tcp import TCPFlow
-from mitmproxy.udp import UDPFlow
-from mitmproxy.utils import emoji
-from mitmproxy.utils import human
+from seleniumwire.thirdparty.mitmproxy import dns, flow
+from seleniumwire.thirdparty.mitmproxy.dns import DNSFlow
+from seleniumwire.thirdparty.mitmproxy.http import HTTPFlow
+from seleniumwire.thirdparty.mitmproxy.tcp import TCPFlow
+from seleniumwire.thirdparty.mitmproxy.udp import UDPFlow
+from seleniumwire.thirdparty.mitmproxy.utils import emoji, human
 
 # Detect Windows Subsystem for Linux and Windows
 IS_WINDOWS_OR_WSL = (

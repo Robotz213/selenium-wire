@@ -1,15 +1,10 @@
 # Default view cutoff *in lines*
 import sys
-from abc import ABC
-from abc import abstractmethod
-from collections.abc import Iterable
-from collections.abc import Iterator
-from collections.abc import Mapping
-from typing import ClassVar
-from typing import Union
+from abc import ABC, abstractmethod
+from collections.abc import Iterable, Iterator, Mapping
+from typing import ClassVar, Union
 
-from mitmproxy import flow
-from mitmproxy import http
+from seleniumwire.thirdparty.mitmproxy import flow, http
 
 if sys.version_info < (3, 13):  # pragma: no cover
     from typing_extensions import deprecated

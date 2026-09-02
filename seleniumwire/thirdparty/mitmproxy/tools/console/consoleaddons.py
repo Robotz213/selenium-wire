@@ -4,24 +4,25 @@ import re
 from collections.abc import Sequence
 
 import mitmproxy.types
-from mitmproxy import command
-from mitmproxy import command_lexer
-from mitmproxy import contentviews
-from mitmproxy import ctx
-from mitmproxy import dns
-from mitmproxy import exceptions
-from mitmproxy import flow
-from mitmproxy import http
-from mitmproxy import log
-from mitmproxy import tcp
-from mitmproxy import udp
-from mitmproxy.contentviews import ContentviewMessage
-from mitmproxy.exceptions import CommandError
-from mitmproxy.log import ALERT
-from mitmproxy.tools.console import keymap
-from mitmproxy.tools.console import overlay
-from mitmproxy.tools.console import signals
-from mitmproxy.utils import strutils
+
+from seleniumwire.thirdparty.mitmproxy import (
+    command,
+    command_lexer,
+    contentviews,
+    ctx,
+    dns,
+    exceptions,
+    flow,
+    http,
+    log,
+    tcp,
+    udp,
+)
+from seleniumwire.thirdparty.mitmproxy.contentviews import ContentviewMessage
+from seleniumwire.thirdparty.mitmproxy.exceptions import CommandError
+from seleniumwire.thirdparty.mitmproxy.log import ALERT
+from seleniumwire.thirdparty.mitmproxy.tools.console import keymap, overlay, signals
+from seleniumwire.thirdparty.mitmproxy.utils import strutils
 
 logger = logging.getLogger(__name__)
 
@@ -684,7 +685,7 @@ class ConsoleAddon:
         """
         The available contexts for key binding.
         """
-        return list(sorted(keymap.Contexts))
+        return sorted(keymap.Contexts)
 
     @command.command("console.key.bind")
     def key_bind(

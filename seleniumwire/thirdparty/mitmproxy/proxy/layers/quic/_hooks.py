@@ -1,17 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from ssl import VerifyMode
 
 from aioquic.tls import CipherSuite
 from cryptography import x509
-from cryptography.hazmat.primitives.asymmetric import dsa
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa
 
-from mitmproxy.proxy import commands
-from mitmproxy.tls import TlsData
+from seleniumwire.thirdparty.mitmproxy.proxy import commands
+from seleniumwire.thirdparty.mitmproxy.tls import TlsData
 
 
 @dataclass

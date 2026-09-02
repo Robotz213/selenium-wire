@@ -4,16 +4,15 @@ import uuid
 import warnings
 from abc import ABCMeta
 from collections.abc import Sequence
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import Flag
 from typing import Literal
 
-from mitmproxy import certs
-from mitmproxy.coretypes import serializable
-from mitmproxy.net import server_spec
-from mitmproxy.proxy import mode_specs
-from mitmproxy.utils import human
+from seleniumwire.thirdparty.mitmproxy import certs
+from seleniumwire.thirdparty.mitmproxy.coretypes import serializable
+from seleniumwire.thirdparty.mitmproxy.net import server_spec
+from seleniumwire.thirdparty.mitmproxy.proxy import mode_specs
+from seleniumwire.thirdparty.mitmproxy.utils import human
 
 
 class ConnectionState(Flag):
@@ -356,4 +355,4 @@ class Server(Connection):
             self.certificate_list = []
 
 
-__all__ = ["Connection", "Client", "Server", "ConnectionState"]
+__all__ = ["Client", "Connection", "ConnectionState", "Server"]

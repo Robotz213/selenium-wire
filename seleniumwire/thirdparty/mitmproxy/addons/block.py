@@ -1,8 +1,8 @@
 import ipaddress
 import logging
 
-from mitmproxy import ctx
-from mitmproxy.proxy import mode_specs
+from seleniumwire.thirdparty.mitmproxy import ctx
+from seleniumwire.thirdparty.mitmproxy.proxy import mode_specs
 
 
 class Block:

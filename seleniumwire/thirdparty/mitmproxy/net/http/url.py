@@ -3,13 +3,11 @@ from __future__ import annotations
 import re
 import urllib.parse
 from collections.abc import Sequence
-from typing import AnyStr
-from typing import overload
+from typing import AnyStr, overload
 
-from mitmproxy.net import check
-from mitmproxy.net.check import is_valid_host
-from mitmproxy.net.check import is_valid_port
-from mitmproxy.utils.strutils import always_str
+from seleniumwire.thirdparty.mitmproxy.net import check
+from seleniumwire.thirdparty.mitmproxy.net.check import is_valid_host, is_valid_port
+from seleniumwire.thirdparty.mitmproxy.utils.strutils import always_str
 
 # This regex extracts & splits the host header into host and port.
 # Handles the edge case of IPv6 addresses containing colons.

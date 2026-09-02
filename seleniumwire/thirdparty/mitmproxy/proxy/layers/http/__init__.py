@@ -3,68 +3,58 @@ import enum
 import time
 from dataclasses import dataclass
 from functools import cached_property
-from logging import DEBUG
-from logging import WARNING
+from logging import DEBUG, WARNING
 
 import wsproto.handshake
 
+from seleniumwire.thirdparty.mitmproxy import flow, http
+from seleniumwire.thirdparty.mitmproxy.connection import (
+    Connection,
+    Server,
+    TransportProtocol,
+)
+from seleniumwire.thirdparty.mitmproxy.net import server_spec
+from seleniumwire.thirdparty.mitmproxy.net.http import url
+from seleniumwire.thirdparty.mitmproxy.net.http.http1 import expected_http_body_size
+from seleniumwire.thirdparty.mitmproxy.net.http.validate import validate_headers
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, events, layer, tunnel
+from seleniumwire.thirdparty.mitmproxy.proxy.layers import quic, tcp, tls, websocket
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.http import _upstream_proxy
+from seleniumwire.thirdparty.mitmproxy.proxy.utils import ReceiveBuffer, expect
+from seleniumwire.thirdparty.mitmproxy.utils import human
+from seleniumwire.thirdparty.mitmproxy.websocket import WebSocketData
+
 from ...context import Context
-from ...mode_specs import ReverseMode
-from ...mode_specs import UpstreamMode
+from ...mode_specs import ReverseMode, UpstreamMode
 from ..quic import QuicStreamEvent
-from ._base import HttpCommand
-from ._base import HttpConnection
-from ._base import ReceiveHttp
-from ._base import StreamId
-from ._events import ErrorCode
-from ._events import HttpEvent
-from ._events import RequestData
-from ._events import RequestEndOfMessage
-from ._events import RequestHeaders
-from ._events import RequestProtocolError
-from ._events import RequestTrailers
-from ._events import ResponseData
-from ._events import ResponseEndOfMessage
-from ._events import ResponseHeaders
-from ._events import ResponseProtocolError
-from ._events import ResponseTrailers
-from ._hooks import HttpConnectedHook
-from ._hooks import HttpConnectErrorHook
-from ._hooks import HttpConnectHook
-from ._hooks import HttpErrorHook
-from ._hooks import HttpRequestHeadersHook
-from ._hooks import HttpRequestHook
-from ._hooks import HttpResponseHeadersHook
-from ._hooks import HttpResponseHook
-from ._http1 import Http1Client
-from ._http1 import Http1Connection
-from ._http1 import Http1Server
-from ._http2 import Http2Client
-from ._http2 import Http2Server
-from ._http3 import Http3Client
-from ._http3 import Http3Server
-from mitmproxy import flow
-from mitmproxy import http
-from mitmproxy.connection import Connection
-from mitmproxy.connection import Server
-from mitmproxy.connection import TransportProtocol
-from mitmproxy.net import server_spec
-from mitmproxy.net.http import url
-from mitmproxy.net.http.http1 import expected_http_body_size
-from mitmproxy.net.http.validate import validate_headers
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy import tunnel
-from mitmproxy.proxy.layers import quic
-from mitmproxy.proxy.layers import tcp
-from mitmproxy.proxy.layers import tls
-from mitmproxy.proxy.layers import websocket
-from mitmproxy.proxy.layers.http import _upstream_proxy
-from mitmproxy.proxy.utils import expect
-from mitmproxy.proxy.utils import ReceiveBuffer
-from mitmproxy.utils import human
-from mitmproxy.websocket import WebSocketData
+from ._base import HttpCommand, HttpConnection, ReceiveHttp, StreamId
+from ._events import (
+    ErrorCode,
+    HttpEvent,
+    RequestData,
+    RequestEndOfMessage,
+    RequestHeaders,
+    RequestProtocolError,
+    RequestTrailers,
+    ResponseData,
+    ResponseEndOfMessage,
+    ResponseHeaders,
+    ResponseProtocolError,
+    ResponseTrailers,
+)
+from ._hooks import (
+    HttpConnectedHook,
+    HttpConnectErrorHook,
+    HttpConnectHook,
+    HttpErrorHook,
+    HttpRequestHeadersHook,
+    HttpRequestHook,
+    HttpResponseHeadersHook,
+    HttpResponseHook,
+)
+from ._http1 import Http1Client, Http1Connection, Http1Server
+from ._http2 import Http2Client, Http2Server
+from ._http3 import Http3Client, Http3Server
 
 
 class HTTPMode(enum.Enum):
@@ -80,8 +70,8 @@ def validate_request(
         return f"Invalid request scheme: {request.scheme}"
     if mode is HTTPMode.transparent and request.method == "CONNECT":
         return (
-            f"mitmproxy received an HTTP CONNECT request even though it is not running in regular/upstream mode. "
-            f"This usually indicates a misconfiguration, please see the mitmproxy mode documentation for details."
+            "mitmproxy received an HTTP CONNECT request even though it is not running in regular/upstream mode. "
+            "This usually indicates a misconfiguration, please see the mitmproxy mode documentation for details."
         )
     if validate_inbound_headers:
         try:
@@ -546,7 +536,7 @@ class HttpStream(layer.Layer):
                 self.child_layer = tcp.TCPLayer(self.context)
             else:
                 yield commands.Log(
-                    f"Sent HTTP 101 response, but no protocol is enabled to upgrade to.",
+                    "Sent HTTP 101 response, but no protocol is enabled to upgrade to.",
                     WARNING,
                 )
                 yield commands.CloseConnection(self.context.client)

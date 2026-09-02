@@ -2,10 +2,11 @@ import enum
 import typing
 from dataclasses import dataclass
 
+from seleniumwire.thirdparty.mitmproxy import http
+from seleniumwire.thirdparty.mitmproxy.http import HTTPFlow
+from seleniumwire.thirdparty.mitmproxy.net.http import status_codes
+
 from ._base import HttpEvent
-from mitmproxy import http
-from mitmproxy.http import HTTPFlow
-from mitmproxy.net.http import status_codes
 
 
 @dataclass
@@ -154,14 +155,14 @@ class ResponseProtocolError(HttpEvent):
 __all__ = [
     "ErrorCode",
     "HttpEvent",
-    "RequestHeaders",
     "RequestData",
     "RequestEndOfMessage",
-    "ResponseHeaders",
-    "ResponseData",
-    "RequestTrailers",
-    "ResponseTrailers",
-    "ResponseEndOfMessage",
+    "RequestHeaders",
     "RequestProtocolError",
+    "RequestTrailers",
+    "ResponseData",
+    "ResponseEndOfMessage",
+    "ResponseHeaders",
     "ResponseProtocolError",
+    "ResponseTrailers",
 ]

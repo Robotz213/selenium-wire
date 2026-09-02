@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from mitmproxy import connection
-from mitmproxy.proxy import commands
+from seleniumwire.thirdparty.mitmproxy import connection
+from seleniumwire.thirdparty.mitmproxy.proxy import commands
 
 
 class QuicStreamCommand(commands.ConnectionCommand):

@@ -2,10 +2,7 @@ import io
 
 from kaitaistruct import KaitaiStream
 
-from mitmproxy.contrib.kaitaistruct import gif
-from mitmproxy.contrib.kaitaistruct import ico
-from mitmproxy.contrib.kaitaistruct import jpeg
-from mitmproxy.contrib.kaitaistruct import png
+from seleniumwire.thirdparty.mitmproxy.contrib.kaitaistruct import gif, ico, jpeg, png
 
 type ImageMetadata = list[tuple[str, str]]
 
@@ -23,9 +20,7 @@ def parse_png(data: bytes) -> ImageMetadata:
             aspectx = chunk.body.pixels_per_unit_x
             aspecty = chunk.body.pixels_per_unit_y
             parts.append(("aspect", f"{aspectx} x {aspecty}"))
-        elif chunk.type == "tEXt":
-            parts.append((chunk.body.keyword, chunk.body.text))
-        elif chunk.type == "iTXt":
+        elif chunk.type == "tEXt" or chunk.type == "iTXt":
             parts.append((chunk.body.keyword, chunk.body.text))
         elif chunk.type == "zTXt":
             parts.append(

@@ -7,24 +7,24 @@ import struct
 import time
 from collections.abc import Iterable
 from dataclasses import dataclass
-from ipaddress import IPv4Address
-from ipaddress import IPv6Address
-from typing import Any
-from typing import cast
-from typing import ClassVar
-from typing import Self
+from ipaddress import IPv4Address, IPv6Address
+from typing import Any, ClassVar, Self, cast
 
-from mitmproxy import flow
-from mitmproxy.coretypes import serializable
-from mitmproxy.net.dns import classes
-from mitmproxy.net.dns import domain_names
-from mitmproxy.net.dns import https_records
-from mitmproxy.net.dns import op_codes
-from mitmproxy.net.dns import response_codes
-from mitmproxy.net.dns import types
-from mitmproxy.net.dns.https_records import HTTPSRecord
-from mitmproxy.net.dns.https_records import HTTPSRecordJSON
-from mitmproxy.net.dns.https_records import SVCParamKeys
+from seleniumwire.thirdparty.mitmproxy import flow
+from seleniumwire.thirdparty.mitmproxy.coretypes import serializable
+from seleniumwire.thirdparty.mitmproxy.net.dns import (
+    classes,
+    domain_names,
+    https_records,
+    op_codes,
+    response_codes,
+    types,
+)
+from seleniumwire.thirdparty.mitmproxy.net.dns.https_records import (
+    HTTPSRecord,
+    HTTPSRecordJSON,
+    SVCParamKeys,
+)
 
 # DNS parameters taken from https://www.iana.org/assignments/dns-parameters/dns-parameters.xml
 
@@ -414,7 +414,7 @@ class DNSMessage(serializable.SerializableDataclass):
             offset += length
             return name
 
-        for i in range(0, len_questions):
+        for i in range(len_questions):
             try:
                 name = unpack_domain_name()
                 type, class_ = Question.HEADER.unpack_from(buffer, offset)
@@ -427,7 +427,7 @@ class DNSMessage(serializable.SerializableDataclass):
             section: list[ResourceRecord], section_name: str, count: int
         ) -> None:
             nonlocal buffer, offset
-            for i in range(0, count):
+            for i in range(count):
                 try:
                     name = unpack_domain_name()
                     type, class_, ttl, len_data = ResourceRecord.HEADER.unpack_from(

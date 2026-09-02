@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Union
 
-from mitmproxy.utils import signals
+from seleniumwire.thirdparty.mitmproxy.utils import signals
 
 StatusMessage = Union[tuple[str, str], str]
 

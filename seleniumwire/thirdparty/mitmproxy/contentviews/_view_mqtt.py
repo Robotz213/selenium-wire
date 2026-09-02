@@ -1,8 +1,7 @@
 import struct
 
-from mitmproxy.contentviews._api import Contentview
-from mitmproxy.contentviews._api import Metadata
-from mitmproxy.utils import strutils
+from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
+from seleniumwire.thirdparty.mitmproxy.utils import strutils
 
 # from https://github.com/nikitastupin/mitmproxy-mqtt-script
 
@@ -77,9 +76,7 @@ class MQTTControlPacket:
         elif self.packet_type == self.SUBSCRIBE:
             self._parse_subscribe_variable_headers()
             self._parse_subscribe_payload()
-        elif self.packet_type == self.SUBACK:
-            pass
-        elif self.packet_type == self.UNSUBSCRIBE:
+        elif self.packet_type == self.SUBACK or self.packet_type == self.UNSUBSCRIBE:
             pass
         else:
             self.payload = None

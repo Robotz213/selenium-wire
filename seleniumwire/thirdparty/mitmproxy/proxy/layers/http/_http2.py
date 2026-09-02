@@ -2,11 +2,8 @@ import collections
 import time
 from collections.abc import Sequence
 from enum import Enum
-from logging import DEBUG
-from logging import ERROR
-from typing import Any
-from typing import assert_never
-from typing import ClassVar
+from logging import DEBUG, ERROR
+from typing import Any, ClassVar, assert_never
 
 import h2.config
 import h2.connection
@@ -17,41 +14,31 @@ import h2.settings
 import h2.stream
 import h2.utilities
 
-from ...commands import CloseConnection
-from ...commands import Log
-from ...commands import RequestWakeup
-from ...commands import SendData
+from seleniumwire.thirdparty.mitmproxy import http, version
+from seleniumwire.thirdparty.mitmproxy.connection import Connection
+from seleniumwire.thirdparty.mitmproxy.net.http import status_codes, url
+from seleniumwire.thirdparty.mitmproxy.utils import human
+
+from ...commands import CloseConnection, Log, RequestWakeup, SendData
 from ...context import Context
-from ...events import ConnectionClosed
-from ...events import DataReceived
-from ...events import Event
-from ...events import Start
-from ...events import Wakeup
+from ...events import ConnectionClosed, DataReceived, Event, Start, Wakeup
 from ...layer import CommandGenerator
 from ...utils import expect
-from . import ErrorCode
-from . import RequestData
-from . import RequestEndOfMessage
-from . import RequestHeaders
-from . import RequestProtocolError
-from . import RequestTrailers
-from . import ResponseData
-from . import ResponseEndOfMessage
-from . import ResponseHeaders
-from . import ResponseProtocolError
-from . import ResponseTrailers
-from ._base import format_error
-from ._base import HttpConnection
-from ._base import HttpEvent
-from ._base import ReceiveHttp
-from ._http_h2 import BufferedH2Connection
-from ._http_h2 import H2ConnectionLogger
-from mitmproxy import http
-from mitmproxy import version
-from mitmproxy.connection import Connection
-from mitmproxy.net.http import status_codes
-from mitmproxy.net.http import url
-from mitmproxy.utils import human
+from . import (
+    ErrorCode,
+    RequestData,
+    RequestEndOfMessage,
+    RequestHeaders,
+    RequestProtocolError,
+    RequestTrailers,
+    ResponseData,
+    ResponseEndOfMessage,
+    ResponseHeaders,
+    ResponseProtocolError,
+    ResponseTrailers,
+)
+from ._base import HttpConnection, HttpEvent, ReceiveHttp, format_error
+from ._http_h2 import BufferedH2Connection, H2ConnectionLogger
 
 
 class StreamState(Enum):
@@ -232,7 +219,7 @@ class Http2Connection(HttpConnection):
                     yield ReceiveHttp(self.ReceiveData(event.stream_id, event.data))
             elif state is StreamState.EXPECTING_HEADERS:
                 yield from self.protocol_error(
-                    f"Received HTTP/2 data frame, expected headers."
+                    "Received HTTP/2 data frame, expected headers."
                 )
                 return True
             self.h2_conn.acknowledge_received_data(
@@ -284,15 +271,13 @@ class Http2Connection(HttpConnection):
             #    if stream_id > event.last_stream_id:
             #        yield ReceiveHttp(self.ReceiveProtocolError(stream_id, f"HTTP/2 connection closed: {event!r}"))
             #        self.streams.pop(stream_id)
-        elif isinstance(event, h2.events.RemoteSettingsChanged):
-            pass
-        elif isinstance(event, h2.events.SettingsAcknowledged):
-            pass
-        elif isinstance(event, h2.events.PriorityUpdated):
-            pass
-        elif isinstance(event, h2.events.PingReceived):
-            pass
-        elif isinstance(event, h2.events.PingAckReceived):
+        elif (
+            isinstance(event, h2.events.RemoteSettingsChanged)
+            or isinstance(event, h2.events.SettingsAcknowledged)
+            or isinstance(event, h2.events.PriorityUpdated)
+            or isinstance(event, h2.events.PingReceived)
+            or isinstance(event, h2.events.PingAckReceived)
+        ):
             pass
         elif isinstance(event, h2.events.PushedStreamReceived):
             yield Log(
@@ -583,7 +568,7 @@ class Http2Client(Http2Connection):
                 self.streams.get(event.stream_id, None)
                 is not StreamState.EXPECTING_HEADERS
             ):
-                yield from self.protocol_error(f"Received unexpected HTTP/2 response.")
+                yield from self.protocol_error("Received unexpected HTTP/2 response.")
                 return True
 
             try:
@@ -625,7 +610,7 @@ class Http2Client(Http2Connection):
             return False
         elif isinstance(event, h2.events.RequestReceived):
             yield from self.protocol_error(
-                f"HTTP/2 protocol error: received request from server"
+                "HTTP/2 protocol error: received request from server"
             )
             return True
         elif isinstance(event, h2.events.RemoteSettingsChanged):
@@ -705,10 +690,10 @@ def parse_h2_response_headers(
 
 
 __all__ = [
+    "Http2Client",
+    "Http2Server",
     "format_h2_request_headers",
     "format_h2_response_headers",
     "parse_h2_request_headers",
     "parse_h2_response_headers",
-    "Http2Client",
-    "Http2Server",
 ]

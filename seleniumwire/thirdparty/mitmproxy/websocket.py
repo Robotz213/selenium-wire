@@ -8,12 +8,11 @@ This module only defines the classes for individual `WebSocketMessage`s and the 
 
 import time
 import warnings
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 
 from wsproto.frame_protocol import Opcode
 
-from mitmproxy.coretypes import serializable
+from seleniumwire.thirdparty.mitmproxy.coretypes import serializable
 
 WebSocketMessageState = tuple[int, bool, bytes, float, bool, bool]
 

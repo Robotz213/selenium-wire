@@ -1,11 +1,9 @@
 import os
 
-from flask import Flask
-from flask import render_template
+from flask import Flask, render_template
 
-from mitmproxy.options import CONF_BASENAME
-from mitmproxy.options import CONF_DIR
-from mitmproxy.utils.magisk import write_magisk_module
+from seleniumwire.thirdparty.mitmproxy.options import CONF_BASENAME, CONF_DIR
+from seleniumwire.thirdparty.mitmproxy.utils.magisk import write_magisk_module
 
 app = Flask(__name__)
 # will be overridden in the addon, setting this here so that the Flask app can be run standalone.
@@ -34,7 +32,7 @@ def cer():
 
 @app.route("/cert/magisk")
 def magisk():
-    filename = CONF_BASENAME + f"-magisk-module.zip"
+    filename = CONF_BASENAME + "-magisk-module.zip"
     p = os.path.join(app.config["CONFDIR"], filename)
     p = os.path.expanduser(p)
 

@@ -12,35 +12,35 @@ import asyncio
 import collections
 import logging
 import time
-from collections.abc import Awaitable
-from collections.abc import Callable
-from collections.abc import MutableMapping
+from collections.abc import Awaitable, Callable, MutableMapping
 from contextlib import contextmanager
 from dataclasses import dataclass
 from types import TracebackType
 from typing import Literal
 
+import mitmproxy_rs
 from OpenSSL import SSL
 
-import mitmproxy_rs
-from mitmproxy import http
-from mitmproxy import options as moptions
-from mitmproxy import tls
-from mitmproxy.connection import Address
-from mitmproxy.connection import Client
-from mitmproxy.connection import Connection
-from mitmproxy.connection import ConnectionState
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy import layers
-from mitmproxy.proxy import mode_specs
-from mitmproxy.proxy import server_hooks
-from mitmproxy.proxy.context import Context
-from mitmproxy.proxy.layers.http import HTTPMode
-from mitmproxy.utils import asyncio_utils
-from mitmproxy.utils import human
-from mitmproxy.utils.data import pkg_data
+from seleniumwire.thirdparty.mitmproxy import http, tls
+from seleniumwire.thirdparty.mitmproxy import options as moptions
+from seleniumwire.thirdparty.mitmproxy.connection import (
+    Address,
+    Client,
+    Connection,
+    ConnectionState,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy import (
+    commands,
+    events,
+    layer,
+    layers,
+    mode_specs,
+    server_hooks,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.context import Context
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.http import HTTPMode
+from seleniumwire.thirdparty.mitmproxy.utils import asyncio_utils, human
+from seleniumwire.thirdparty.mitmproxy.utils.data import pkg_data
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +126,7 @@ class ConnectionHandler(metaclass=abc.ABCMeta):
 
     async def handle_client(self) -> None:
         asyncio_utils.set_current_task_debug_info(
-            name=f"client handler",
+            name="client handler",
             client=self.client.peername,
         )
         watch = asyncio_utils.create_task(
@@ -147,7 +147,7 @@ class ConnectionHandler(metaclass=abc.ABCMeta):
             await self.server_event(events.Start())
             handler = asyncio_utils.create_task(
                 self.handle_connection(self.client),
-                name=f"client connection handler",
+                name="client connection handler",
                 keep_ref=False,
                 client=self.client.peername,
             )
@@ -181,10 +181,10 @@ class ConnectionHandler(metaclass=abc.ABCMeta):
 
     async def open_connection(self, command: commands.OpenConnection) -> None:
         if not command.connection.address:
-            self.log(f"Cannot open connection, no hostname given.")
+            self.log("Cannot open connection, no hostname given.")
             await self.server_event(
                 events.OpenConnectionCompleted(
-                    command, f"Cannot open connection, no hostname given."
+                    command, "Cannot open connection, no hostname given."
                 )
             )
             return
@@ -434,7 +434,7 @@ class ConnectionHandler(metaclass=abc.ABCMeta):
                     else:
                         raise RuntimeError(f"Unexpected command: {command}")
             except Exception:
-                self.log(f"mitmproxy has crashed!", logging.ERROR, exc_info=True)
+                self.log("mitmproxy has crashed!", logging.ERROR, exc_info=True)
 
     def close_connection(
         self, connection: Connection, half_close: bool = False

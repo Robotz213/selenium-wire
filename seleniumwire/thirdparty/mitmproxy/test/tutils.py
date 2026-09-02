@@ -1,5 +1,4 @@
-from mitmproxy import dns
-from mitmproxy import http
+from seleniumwire.thirdparty.mitmproxy import dns, http
 
 
 def tdnsreq(**kwargs) -> dns.DNSMessage:

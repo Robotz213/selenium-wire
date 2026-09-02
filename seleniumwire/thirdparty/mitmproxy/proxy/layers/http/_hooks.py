@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from mitmproxy import http
-from mitmproxy.proxy import commands
+from seleniumwire.thirdparty.mitmproxy import http
+from seleniumwire.thirdparty.mitmproxy.proxy import commands
 
 
 @dataclass

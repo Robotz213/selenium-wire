@@ -37,22 +37,13 @@ import functools
 import os
 import re
 import sys
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import AnyStr
-from typing import cast
-from typing import ClassVar
-from typing import Generic
-from typing import Protocol
+from typing import AnyStr, ClassVar, Generic, Protocol, cast
 
 import pyparsing as pp
 
-from mitmproxy import dns
-from mitmproxy import flow
-from mitmproxy import http
-from mitmproxy import tcp
-from mitmproxy import udp
+from seleniumwire.thirdparty.mitmproxy import dns, flow, http, tcp, udp
 
 maybe_ignore_case: re.RegexFlag = (
     cast(re.RegexFlag, re.IGNORECASE)
@@ -291,9 +282,11 @@ class FContentType(_BinRex):
 
     @only(http.HTTPFlow)
     def __call__(self, f) -> bool:
-        if _check_content_type(self.re, f.request):
-            return True
-        elif f.response and _check_content_type(self.re, f.response):
+        if (
+            _check_content_type(self.re, f.request)
+            or f.response
+            and _check_content_type(self.re, f.response)
+        ):
             return True
         return False
 

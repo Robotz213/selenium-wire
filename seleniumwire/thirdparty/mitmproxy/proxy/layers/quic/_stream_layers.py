@@ -8,52 +8,59 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
-from logging import DEBUG
-from logging import ERROR
-from logging import WARNING
+from logging import DEBUG, ERROR, WARNING
 
 from aioquic.buffer import Buffer as QuicBuffer
 from aioquic.h3.connection import ErrorCode as H3ErrorCode
 from aioquic.quic import events as quic_events
 from aioquic.quic.configuration import QuicConfiguration
-from aioquic.quic.connection import QuicConnection
-from aioquic.quic.connection import QuicConnectionState
-from aioquic.quic.connection import QuicErrorCode
-from aioquic.quic.packet import encode_quic_version_negotiation
-from aioquic.quic.packet import PACKET_TYPE_INITIAL
-from aioquic.quic.packet import pull_quic_header
+from aioquic.quic.connection import QuicConnection, QuicConnectionState, QuicErrorCode
+from aioquic.quic.packet import (
+    PACKET_TYPE_INITIAL,
+    encode_quic_version_negotiation,
+    pull_quic_header,
+)
 from cryptography import x509
 
+from seleniumwire.thirdparty.mitmproxy import certs, connection, ctx
+from seleniumwire.thirdparty.mitmproxy.net import tls
+from seleniumwire.thirdparty.mitmproxy.proxy import (
+    commands,
+    context,
+    events,
+    layer,
+    tunnel,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.tls import (
+    TlsClienthelloHook,
+    TlsEstablishedClientHook,
+    TlsEstablishedServerHook,
+    TlsFailedClientHook,
+    TlsFailedServerHook,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.udp import UDPLayer
+from seleniumwire.thirdparty.mitmproxy.tls import ClientHelloData
+
 from ._client_hello_parser import quic_parse_client_hello_from_datagrams
-from ._commands import CloseQuicConnection
-from ._commands import QuicStreamCommand
-from ._commands import ResetQuicStream
-from ._commands import SendQuicStreamData
-from ._commands import StopSendingQuicStream
-from ._events import QuicConnectionClosed
-from ._events import QuicStreamDataReceived
-from ._events import QuicStreamReset
-from ._events import QuicStreamStopSending
-from ._hooks import QuicStartClientHook
-from ._hooks import QuicStartServerHook
-from ._hooks import QuicTlsData
-from ._hooks import QuicTlsSettings
-from mitmproxy import certs
-from mitmproxy import connection
-from mitmproxy import ctx
-from mitmproxy.net import tls
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import context
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy import tunnel
-from mitmproxy.proxy.layers.tls import TlsClienthelloHook
-from mitmproxy.proxy.layers.tls import TlsEstablishedClientHook
-from mitmproxy.proxy.layers.tls import TlsEstablishedServerHook
-from mitmproxy.proxy.layers.tls import TlsFailedClientHook
-from mitmproxy.proxy.layers.tls import TlsFailedServerHook
-from mitmproxy.proxy.layers.udp import UDPLayer
-from mitmproxy.tls import ClientHelloData
+from ._commands import (
+    CloseQuicConnection,
+    QuicStreamCommand,
+    ResetQuicStream,
+    SendQuicStreamData,
+    StopSendingQuicStream,
+)
+from ._events import (
+    QuicConnectionClosed,
+    QuicStreamDataReceived,
+    QuicStreamReset,
+    QuicStreamStopSending,
+)
+from ._hooks import (
+    QuicStartClientHook,
+    QuicStartServerHook,
+    QuicTlsData,
+    QuicTlsSettings,
+)
 
 SUPPORTED_QUIC_VERSIONS_SERVER = QuicConfiguration(is_client=False).supported_versions
 
@@ -143,7 +150,7 @@ class QuicLayer(tunnel.TunnelLayer):
             yield QuicStartServerHook(tls_data)
         if not tls_data.settings:
             yield commands.Log(
-                f"No QUIC context was provided, failing connection.", ERROR
+                "No QUIC context was provided, failing connection.", ERROR
             )
             yield commands.CloseConnection(self.conn)
             return
@@ -439,7 +446,7 @@ class ClientQuicLayer(QuicLayer):
     ) -> layer.CommandGenerator[tuple[bool, str | None]]:
         if not self.context.options.http3:
             yield commands.Log(
-                f"Swallowing QUIC handshake because HTTP/3 is disabled.", DEBUG
+                "Swallowing QUIC handshake because HTTP/3 is disabled.", DEBUG
             )
             return False, None
 
@@ -558,7 +565,7 @@ class ClientQuicLayer(QuicLayer):
 
     def start_server_tls(self) -> layer.CommandGenerator[str | None]:
         if not self.server_tls_available:
-            return f"No server QUIC available."
+            return "No server QUIC available."
         err = yield commands.OpenConnection(self.context.server)
         return err
 

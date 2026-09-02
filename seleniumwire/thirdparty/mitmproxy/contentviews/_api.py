@@ -7,12 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-from mitmproxy import http
-from mitmproxy import tcp
-from mitmproxy import udp
-from mitmproxy.dns import DNSMessage
-from mitmproxy.flow import Flow
-from mitmproxy.websocket import WebSocketMessage
+from seleniumwire.thirdparty.mitmproxy import http, tcp, udp
+from seleniumwire.thirdparty.mitmproxy.dns import DNSMessage
+from seleniumwire.thirdparty.mitmproxy.flow import Flow
+from seleniumwire.thirdparty.mitmproxy.websocket import WebSocketMessage
 
 logger = logging.getLogger(__name__)
 

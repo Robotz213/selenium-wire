@@ -1,12 +1,8 @@
 from collections.abc import Sequence
 from typing import NamedTuple
 
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy import flowfilter
-from mitmproxy import http
-from mitmproxy import version
-from mitmproxy.net.http.status_codes import NO_RESPONSE
+from seleniumwire.thirdparty.mitmproxy import ctx, exceptions, flowfilter, http, version
+from seleniumwire.thirdparty.mitmproxy.net.http.status_codes import NO_RESPONSE
 
 
 class BlockSpec(NamedTuple):

@@ -2,10 +2,12 @@ import math
 
 import urwid
 
-from mitmproxy.tools.console import grideditor
-from mitmproxy.tools.console import keymap
-from mitmproxy.tools.console import layoutwidget
-from mitmproxy.tools.console import signals
+from seleniumwire.thirdparty.mitmproxy.tools.console import (
+    grideditor,
+    keymap,
+    layoutwidget,
+    signals,
+)
 
 
 class SimpleOverlay(urwid.Overlay, layoutwidget.LayoutWidget):
@@ -18,7 +20,7 @@ class SimpleOverlay(urwid.Overlay, layoutwidget.LayoutWidget):
 
     @property
     def keyctx(self):
-        return getattr(self.widget, "keyctx")
+        return self.widget.keyctx
 
     # mypy: Cannot override writeable attribute with read-only property
     @keyctx.setter

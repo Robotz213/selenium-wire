@@ -1,10 +1,9 @@
-from functools import lru_cache
-
-import urwid
+from functools import cache
 
 import mitmproxy.tools.console.master
-from mitmproxy.tools.console import common
-from mitmproxy.tools.console import layoutwidget
+import urwid
+
+from seleniumwire.thirdparty.mitmproxy.tools.console import common, layoutwidget
 
 
 class FlowItem(urwid.WidgetWrap):
@@ -68,7 +67,7 @@ class FlowListWalker(urwid.ListWalker):
         if self.master.commands.execute("view.properties.inbounds %d" % index):
             self.master.view.focus.index = index
 
-    @lru_cache(maxsize=None)
+    @cache
     def _get(self, pos: int) -> tuple[FlowItem | None, int | None]:
         if not self.master.view.inbounds(pos):
             return None, None
@@ -86,7 +85,7 @@ class FlowListBox(urwid.ListBox, layoutwidget.LayoutWidget):
     keyctx = "flowlist"
 
     def __init__(self, master: "mitmproxy.tools.console.master.ConsoleMaster") -> None:
-        self.master: "mitmproxy.tools.console.master.ConsoleMaster" = master
+        self.master: mitmproxy.tools.console.master.ConsoleMaster = master
         super().__init__(FlowListWalker(master))
         self.master.options.subscribe(
             self.set_flowlist_layout, ["console_flowlist_layout"]

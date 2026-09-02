@@ -2,11 +2,12 @@ import logging
 import re
 from collections.abc import Sequence
 
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy.addons.modifyheaders import ModifySpec
-from mitmproxy.addons.modifyheaders import parse_modify_spec
-from mitmproxy.log import ALERT
+from seleniumwire.thirdparty.mitmproxy import ctx, exceptions
+from seleniumwire.thirdparty.mitmproxy.addons.modifyheaders import (
+    ModifySpec,
+    parse_modify_spec,
+)
+from seleniumwire.thirdparty.mitmproxy.log import ALERT
 
 logger = logging.getLogger(__name__)
 

@@ -5,30 +5,21 @@ import logging
 import time
 from collections.abc import Sequence
 from types import TracebackType
-from typing import cast
-from typing import Literal
+from typing import Literal, cast
 
 import mitmproxy.types
-from mitmproxy import command
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy import flow
-from mitmproxy import http
-from mitmproxy import io
-from mitmproxy.connection import ConnectionState
-from mitmproxy.connection import Server
-from mitmproxy.hooks import UpdateHook
-from mitmproxy.log import ALERT
-from mitmproxy.options import Options
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layers
-from mitmproxy.proxy import server
-from mitmproxy.proxy.context import Context
-from mitmproxy.proxy.layer import CommandGenerator
-from mitmproxy.proxy.layers.http import HTTPMode
-from mitmproxy.proxy.mode_specs import UpstreamMode
-from mitmproxy.utils import asyncio_utils
+
+from seleniumwire.thirdparty.mitmproxy import command, ctx, exceptions, flow, http, io
+from seleniumwire.thirdparty.mitmproxy.connection import ConnectionState, Server
+from seleniumwire.thirdparty.mitmproxy.hooks import UpdateHook
+from seleniumwire.thirdparty.mitmproxy.log import ALERT
+from seleniumwire.thirdparty.mitmproxy.options import Options
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, events, layers, server
+from seleniumwire.thirdparty.mitmproxy.proxy.context import Context
+from seleniumwire.thirdparty.mitmproxy.proxy.layer import CommandGenerator
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.http import HTTPMode
+from seleniumwire.thirdparty.mitmproxy.proxy.mode_specs import UpstreamMode
+from seleniumwire.thirdparty.mitmproxy.utils import asyncio_utils
 
 logger = logging.getLogger(__name__)
 
@@ -189,7 +180,7 @@ class ClientPlayback:
                 else:
                     await h.replay()
             except Exception:
-                logger.exception(f"Client replay has crashed!")
+                logger.exception("Client replay has crashed!")
             self.queue.task_done()
             self.inflight = None
 

@@ -9,10 +9,10 @@ from functools import cache
 from typing import Protocol
 
 import mitmproxy_rs
-from mitmproxy import ctx
-from mitmproxy import dns
-from mitmproxy.flow import Error
-from mitmproxy.proxy import mode_specs
+
+from seleniumwire.thirdparty.mitmproxy import ctx, dns
+from seleniumwire.thirdparty.mitmproxy.flow import Error
+from seleniumwire.thirdparty.mitmproxy.proxy import mode_specs
 
 logger = logging.getLogger(__name__)
 

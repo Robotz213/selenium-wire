@@ -2,15 +2,10 @@ import asyncio
 import logging
 import os.path
 import sys
-from typing import BinaryIO
-from typing import Optional
+from typing import BinaryIO, Optional
 
-from mitmproxy import command
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy import flowfilter
-from mitmproxy import io
-from mitmproxy.utils import asyncio_utils
+from seleniumwire.thirdparty.mitmproxy import command, ctx, exceptions, flowfilter, io
+from seleniumwire.thirdparty.mitmproxy.utils import asyncio_utils
 
 logger = logging.getLogger(__name__)
 

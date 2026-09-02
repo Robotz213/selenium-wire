@@ -2,12 +2,10 @@ import html
 import textwrap
 from dataclasses import dataclass
 
-from mitmproxy import http
-from mitmproxy.connection import Connection
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy.context import Context
+from seleniumwire.thirdparty.mitmproxy import http
+from seleniumwire.thirdparty.mitmproxy.connection import Connection
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, events, layer
+from seleniumwire.thirdparty.mitmproxy.proxy.context import Context
 
 StreamId = int
 

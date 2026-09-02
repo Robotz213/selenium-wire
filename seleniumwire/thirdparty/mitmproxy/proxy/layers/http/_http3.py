@@ -4,43 +4,38 @@ from typing import assert_never
 
 from aioquic.h3.connection import ErrorCode as H3ErrorCode
 from aioquic.h3.connection import FrameUnexpected as H3FrameUnexpected
-from aioquic.h3.events import DataReceived
-from aioquic.h3.events import HeadersReceived
-from aioquic.h3.events import PushPromiseReceived
+from aioquic.h3.events import DataReceived, HeadersReceived, PushPromiseReceived
 
-from . import ErrorCode
-from . import RequestData
-from . import RequestEndOfMessage
-from . import RequestHeaders
-from . import RequestProtocolError
-from . import RequestTrailers
-from . import ResponseData
-from . import ResponseEndOfMessage
-from . import ResponseHeaders
-from . import ResponseProtocolError
-from . import ResponseTrailers
-from ._base import format_error
-from ._base import HttpConnection
-from ._base import HttpEvent
-from ._base import ReceiveHttp
-from ._http2 import format_h2_request_headers
-from ._http2 import format_h2_response_headers
-from ._http2 import parse_h2_request_headers
-from ._http2 import parse_h2_response_headers
-from ._http_h3 import LayeredH3Connection
-from ._http_h3 import StreamClosed
-from ._http_h3 import TrailersReceived
-from mitmproxy import connection
-from mitmproxy import http
-from mitmproxy import version
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import context
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy.layers.quic import error_code_to_str
-from mitmproxy.proxy.layers.quic import QuicConnectionClosed
-from mitmproxy.proxy.layers.quic import QuicStreamEvent
-from mitmproxy.proxy.utils import expect
+from seleniumwire.thirdparty.mitmproxy import connection, http, version
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, context, events, layer
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.quic import (
+    QuicConnectionClosed,
+    QuicStreamEvent,
+    error_code_to_str,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.utils import expect
+
+from . import (
+    ErrorCode,
+    RequestData,
+    RequestEndOfMessage,
+    RequestHeaders,
+    RequestProtocolError,
+    RequestTrailers,
+    ResponseData,
+    ResponseEndOfMessage,
+    ResponseHeaders,
+    ResponseProtocolError,
+    ResponseTrailers,
+)
+from ._base import HttpConnection, HttpEvent, ReceiveHttp, format_error
+from ._http2 import (
+    format_h2_request_headers,
+    format_h2_response_headers,
+    parse_h2_request_headers,
+    parse_h2_response_headers,
+)
+from ._http_h3 import LayeredH3Connection, StreamClosed, TrailersReceived
 
 
 class Http3Connection(HttpConnection):
@@ -189,7 +184,7 @@ class Http3Connection(HttpConnection):
                 elif isinstance(h3_event, PushPromiseReceived):  # pragma: no cover
                     self.h3_conn.close_connection(
                         error_code=H3ErrorCode.H3_GENERAL_PROTOCOL_ERROR,
-                        reason_phrase=f"Received HTTP/3 push promise, even though we signalled no support.",
+                        reason_phrase="Received HTTP/3 push promise, even though we signalled no support.",
                     )
                 else:  # pragma: no cover
                     raise AssertionError(f"Unexpected event: {event!r}")

@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
+from kaitaistruct import KaitaiStruct
 from kaitaistruct import __version__ as ks_version
 from pkg_resources import parse_version
 

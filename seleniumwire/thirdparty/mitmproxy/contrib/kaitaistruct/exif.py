@@ -1,11 +1,7 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
-import array
-import struct
-import zlib
-from enum import Enum
 
-from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
+from kaitaistruct import KaitaiStruct
 from kaitaistruct import __version__ as ks_version
 from pkg_resources import parse_version
 

@@ -890,7 +890,7 @@ class ASWBXML:
 
 				strTag = self.codePages[self.currentCodePage].getTag(token)
 				if (strTag == None):
-					strTag = "UNKNOWN_TAG_{0,2:X}".format(token)
+					strTag = "UNKNOWN_TAG_{0,2:X}".format()
 
 				newNode = self.xmlDoc.createElement(strTag)
 				# not sure if this should be set on every node or not

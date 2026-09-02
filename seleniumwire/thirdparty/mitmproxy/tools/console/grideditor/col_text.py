@@ -5,8 +5,8 @@ In a nutshell, text columns are actually a proxy class for byte columns,
 which just encode/decodes contents.
 """
 
-from mitmproxy.tools.console import signals
-from mitmproxy.tools.console.grideditor import col_bytes
+from seleniumwire.thirdparty.mitmproxy.tools.console import signals
+from seleniumwire.thirdparty.mitmproxy.tools.console.grideditor import col_bytes
 
 
 class Column(col_bytes.Column):

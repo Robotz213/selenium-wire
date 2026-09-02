@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from mitmproxy import connection
-from mitmproxy.proxy import events
+from seleniumwire.thirdparty.mitmproxy import connection
+from seleniumwire.thirdparty.mitmproxy.proxy import events
 
 
 @dataclass

@@ -1,18 +1,20 @@
 import hashlib
 import logging
 import urllib
-from collections.abc import Hashable
-from collections.abc import Sequence
+from collections.abc import Hashable, Sequence
 from typing import Any
 
 import mitmproxy.types
-from mitmproxy import command
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy import flow
-from mitmproxy import hooks
-from mitmproxy import http
-from mitmproxy import io
+
+from seleniumwire.thirdparty.mitmproxy import (
+    command,
+    ctx,
+    exceptions,
+    flow,
+    hooks,
+    http,
+    io,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -290,16 +292,12 @@ class ServerPlayback:
                 or ctx.options.server_replay_extra == "kill"
             ):
                 logging.warning(
-                    "server_playback: killed non-replay request {}".format(
-                        f.request.url
-                    )
+                    f"server_playback: killed non-replay request {f.request.url}"
                 )
                 f.kill()
             elif ctx.options.server_replay_extra != "forward":
                 logging.warning(
-                    "server_playback: returned {} non-replay request {}".format(
-                        ctx.options.server_replay_extra, f.request.url
-                    )
+                    f"server_playback: returned {ctx.options.server_replay_extra} non-replay request {f.request.url}"
                 )
                 f.response = http.Response.make(int(ctx.options.server_replay_extra))
                 f.is_replay = "response"

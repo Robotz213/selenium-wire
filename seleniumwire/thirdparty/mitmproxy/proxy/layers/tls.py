@@ -3,30 +3,27 @@ import time
 import typing
 from collections.abc import Iterator
 from dataclasses import dataclass
-from logging import DEBUG
-from logging import ERROR
-from logging import INFO
-from logging import WARNING
+from logging import DEBUG, ERROR, INFO, WARNING
 
 from OpenSSL import SSL
 
-from mitmproxy import certs
-from mitmproxy import connection
-from mitmproxy.connection import TlsVersion
-from mitmproxy.net.tls import starts_like_dtls_record
-from mitmproxy.net.tls import starts_like_tls_record
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import context
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy import tunnel
-from mitmproxy.proxy.commands import StartHook
-from mitmproxy.proxy.layers import tcp
-from mitmproxy.proxy.layers import udp
-from mitmproxy.tls import ClientHello
-from mitmproxy.tls import ClientHelloData
-from mitmproxy.tls import TlsData
-from mitmproxy.utils import human
+from seleniumwire.thirdparty.mitmproxy import certs, connection
+from seleniumwire.thirdparty.mitmproxy.connection import TlsVersion
+from seleniumwire.thirdparty.mitmproxy.net.tls import (
+    starts_like_dtls_record,
+    starts_like_tls_record,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy import (
+    commands,
+    context,
+    events,
+    layer,
+    tunnel,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.commands import StartHook
+from seleniumwire.thirdparty.mitmproxy.proxy.layers import tcp, udp
+from seleniumwire.thirdparty.mitmproxy.tls import ClientHello, ClientHelloData, TlsData
+from seleniumwire.thirdparty.mitmproxy.utils import human
 
 
 def handshake_record_contents(data: bytes) -> Iterator[bytes]:
@@ -340,14 +337,14 @@ class TLSLayer(tunnel.TunnelLayer):
                 ]
                 and data[:4].isascii()
             ):
-                err = f"The remote server does not speak TLS."
+                err = "The remote server does not speak TLS."
             elif last_err in [
                 ("SSL routines", "ssl3_read_bytes", "tlsv1 alert protocol version"),
                 ("SSL routines", "", "tlsv1 alert protocol version"),  # OpenSSL 3+
             ]:
                 err = (
-                    f"The remote server and mitmproxy cannot agree on a TLS version to use. "
-                    f"You may need to adjust mitmproxy's tls_version_server_min option."
+                    "The remote server and mitmproxy cannot agree on a TLS version to use. "
+                    "You may need to adjust mitmproxy's tls_version_server_min option."
                 )
             else:
                 err = f"OpenSSL {e!r}"
@@ -648,8 +645,8 @@ class ClientTLSLayer(TLSLayer):
             or "('SSL routines', '', 'unsupported protocol')" in err  # OpenSSL 3+
         ):
             err = (
-                f"Client and mitmproxy cannot agree on a TLS version to use. "
-                f"You may need to adjust mitmproxy's tls_version_client_min option."
+                "Client and mitmproxy cannot agree on a TLS version to use. "
+                "You may need to adjust mitmproxy's tls_version_client_min option."
             )
         elif (
             "unknown ca" in err

@@ -1,29 +1,32 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from aioquic.h3.connection import FrameUnexpected
-from aioquic.h3.connection import H3Connection
-from aioquic.h3.connection import H3Event
-from aioquic.h3.connection import H3Stream
-from aioquic.h3.connection import Headers
-from aioquic.h3.connection import HeadersState
+from aioquic.h3.connection import (
+    FrameUnexpected,
+    H3Connection,
+    H3Event,
+    H3Stream,
+    Headers,
+    HeadersState,
+)
 from aioquic.h3.events import HeadersReceived
 from aioquic.quic.configuration import QuicConfiguration
 from aioquic.quic.events import StreamDataReceived
 from aioquic.quic.packet import QuicErrorCode
 
-from mitmproxy import connection
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import layer
-from mitmproxy.proxy.layers.quic import CloseQuicConnection
-from mitmproxy.proxy.layers.quic import QuicConnectionClosed
-from mitmproxy.proxy.layers.quic import QuicStreamDataReceived
-from mitmproxy.proxy.layers.quic import QuicStreamEvent
-from mitmproxy.proxy.layers.quic import QuicStreamReset
-from mitmproxy.proxy.layers.quic import QuicStreamStopSending
-from mitmproxy.proxy.layers.quic import ResetQuicStream
-from mitmproxy.proxy.layers.quic import SendQuicStreamData
-from mitmproxy.proxy.layers.quic import StopSendingQuicStream
+from seleniumwire.thirdparty.mitmproxy import connection
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, layer
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.quic import (
+    CloseQuicConnection,
+    QuicConnectionClosed,
+    QuicStreamDataReceived,
+    QuicStreamEvent,
+    QuicStreamReset,
+    QuicStreamStopSending,
+    ResetQuicStream,
+    SendQuicStreamData,
+    StopSendingQuicStream,
+)
 
 
 @dataclass

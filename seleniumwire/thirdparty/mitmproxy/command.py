@@ -8,18 +8,14 @@ import logging
 import sys
 import textwrap
 import types
-from collections.abc import Callable
-from collections.abc import Iterable
-from collections.abc import Sequence
-from typing import Any
-from typing import NamedTuple
-
-import pyparsing
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any, NamedTuple
 
 import mitmproxy.types
-from mitmproxy import command_lexer
-from mitmproxy import exceptions
-from mitmproxy.command_lexer import unquote
+import pyparsing
+
+from seleniumwire.thirdparty.mitmproxy import command_lexer, exceptions
+from seleniumwire.thirdparty.mitmproxy.command_lexer import unquote
 
 
 def verify_arg_signature(f: Callable, args: Iterable[Any], kwargs: dict) -> None:

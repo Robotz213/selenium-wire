@@ -1,9 +1,8 @@
-from .._utils import merge_repeated_keys
-from .._utils import yaml_dumps
+from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
+from seleniumwire.thirdparty.mitmproxy.contrib import imghdr
+
+from .._utils import merge_repeated_keys, yaml_dumps
 from . import image_parser
-from mitmproxy.contentviews._api import Contentview
-from mitmproxy.contentviews._api import Metadata
-from mitmproxy.contrib import imghdr
 
 
 def test_ico(h, f):

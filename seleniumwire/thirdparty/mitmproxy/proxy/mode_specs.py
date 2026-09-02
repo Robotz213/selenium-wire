@@ -26,16 +26,15 @@ import dataclasses
 import platform
 import re
 import sys
-from abc import ABCMeta
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from functools import cache
-from typing import ClassVar
-from typing import Literal
+from typing import ClassVar, Literal
 
 import mitmproxy_rs
-from mitmproxy.coretypes.serializable import Serializable
-from mitmproxy.net import server_spec
+
+from seleniumwire.thirdparty.mitmproxy.coretypes.serializable import Serializable
+from seleniumwire.thirdparty.mitmproxy.net import server_spec
 
 if sys.version_info < (3, 11):
     from typing_extensions import Self  # pragma: no cover
@@ -126,7 +125,7 @@ class ProxyMode(Serializable, metaclass=ABCMeta):
         try:
             mode_cls = ProxyMode.__types[mode.lower()]
         except KeyError:
-            raise ValueError(f"unknown mode")
+            raise ValueError("unknown mode")
 
         if not issubclass(mode_cls, cls):
             raise ValueError(f"{mode!r} is not a spec for a {cls.type_name} mode")

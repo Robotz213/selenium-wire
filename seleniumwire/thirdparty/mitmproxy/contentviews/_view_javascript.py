@@ -1,9 +1,8 @@
 import io
 import re
 
-from mitmproxy.contentviews._api import Contentview
-from mitmproxy.contentviews._api import Metadata
-from mitmproxy.utils import strutils
+from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
+from seleniumwire.thirdparty.mitmproxy.utils import strutils
 
 DELIMITERS = "{};\n"
 SPECIAL_AREAS = (

@@ -5,9 +5,8 @@ import logging
 import sys
 from typing import IO
 
-from mitmproxy import ctx
-from mitmproxy import log
-from mitmproxy.utils import vt_codes
+from seleniumwire.thirdparty.mitmproxy import ctx, log
+from seleniumwire.thirdparty.mitmproxy.utils import vt_codes
 
 
 class TermLog:

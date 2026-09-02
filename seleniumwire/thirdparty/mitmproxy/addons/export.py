@@ -1,18 +1,13 @@
 import logging
 import shlex
-from collections.abc import Callable
-from collections.abc import Sequence
-
-import pyperclip
+from collections.abc import Callable, Sequence
 
 import mitmproxy.types
-from mitmproxy import command
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy import flow
-from mitmproxy import http
-from mitmproxy.net.http.http1 import assemble
-from mitmproxy.utils import strutils
+import pyperclip
+
+from seleniumwire.thirdparty.mitmproxy import command, ctx, exceptions, flow, http
+from seleniumwire.thirdparty.mitmproxy.net.http.http1 import assemble
+from seleniumwire.thirdparty.mitmproxy.utils import strutils
 
 
 def cleanup_request(f: flow.Flow) -> http.Request:
@@ -185,7 +180,7 @@ class Export:
         """
         Return a list of the supported export formats.
         """
-        return list(sorted(formats.keys()))
+        return sorted(formats.keys())
 
     @command.command("export.file")
     def file(self, format: str, flow: flow.Flow, path: mitmproxy.types.Path) -> None:

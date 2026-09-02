@@ -12,29 +12,27 @@ The View:
 import collections
 import logging
 import re
-from collections.abc import Iterator
-from collections.abc import MutableMapping
-from collections.abc import Sequence
-from typing import Any
-from typing import Optional
-
-import sortedcontainers
+from collections.abc import Iterator, MutableMapping, Sequence
+from typing import Any, Optional
 
 import mitmproxy.flow
-from mitmproxy import command
-from mitmproxy import connection
-from mitmproxy import ctx
-from mitmproxy import dns
-from mitmproxy import exceptions
-from mitmproxy import flowfilter
-from mitmproxy import hooks
-from mitmproxy import http
-from mitmproxy import io
-from mitmproxy import tcp
-from mitmproxy import udp
-from mitmproxy.log import ALERT
-from mitmproxy.utils import human
-from mitmproxy.utils import signals
+import sortedcontainers
+
+from seleniumwire.thirdparty.mitmproxy import (
+    command,
+    connection,
+    ctx,
+    dns,
+    exceptions,
+    flowfilter,
+    hooks,
+    http,
+    io,
+    tcp,
+    udp,
+)
+from seleniumwire.thirdparty.mitmproxy.log import ALERT
+from seleniumwire.thirdparty.mitmproxy.utils import human, signals
 
 # The underlying sorted list implementation expects the sort key to be stable
 # for the lifetime of the object. However, if we sort by size, for instance,
@@ -270,10 +268,8 @@ class View(collections.abc.Sequence):
             return
         if offset < 0:
             offset = len(self) + offset
-        if offset < 0:
-            offset = 0
-        if offset > len(self) - 1:
-            offset = len(self) - 1
+        offset = max(offset, 0)
+        offset = min(offset, len(self) - 1)
         self.focus.flow = self[offset]
 
     @command.command("view.focus.next")
@@ -306,7 +302,7 @@ class View(collections.abc.Sequence):
         """
         Choices supported by the view_order option.
         """
-        return list(sorted(self.orders.keys()))
+        return sorted(self.orders.keys())
 
     @command.command("view.order.reverse")
     def set_reversed(self, boolean: bool) -> None:

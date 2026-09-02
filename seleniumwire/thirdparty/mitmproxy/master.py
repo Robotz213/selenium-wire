@@ -1,17 +1,20 @@
 import asyncio
 import logging
 
+from seleniumwire.thirdparty.mitmproxy import (
+    addonmanager,
+    command,
+    eventsequence,
+    hooks,
+    http,
+    log,
+    options,
+)
+
 from . import ctx as mitmproxy_ctx
 from .addons import termlog
 from .proxy.mode_specs import ReverseMode
 from .utils import asyncio_utils
-from mitmproxy import addonmanager
-from mitmproxy import command
-from mitmproxy import eventsequence
-from mitmproxy import hooks
-from mitmproxy import http
-from mitmproxy import log
-from mitmproxy import options
 
 logger = logging.getLogger(__name__)
 

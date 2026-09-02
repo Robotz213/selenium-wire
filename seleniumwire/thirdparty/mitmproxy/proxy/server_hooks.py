@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
+from seleniumwire.thirdparty.mitmproxy import connection
+
 from . import commands
-from mitmproxy import connection
 
 
 @dataclass

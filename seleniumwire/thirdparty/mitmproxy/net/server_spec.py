@@ -6,7 +6,7 @@ import re
 from functools import cache
 from typing import Literal
 
-from mitmproxy.net import check
+from seleniumwire.thirdparty.mitmproxy.net import check
 
 ServerSpec = tuple[
     Literal["http", "https", "http3", "tls", "dtls", "tcp", "udp", "dns", "quic"],
@@ -78,7 +78,7 @@ def parse(server_spec: str, default_scheme: str) -> ServerSpec:
                 "dns": 53,
             }[scheme]
         except KeyError:
-            raise ValueError(f"Port specification missing.")
+            raise ValueError("Port specification missing.")
     if not check.is_valid_port(port):
         raise ValueError(f"Invalid port: {port}")
 

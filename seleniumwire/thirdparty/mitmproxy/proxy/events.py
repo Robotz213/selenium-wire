@@ -6,15 +6,12 @@ The counterpart to events are commands.
 
 import typing
 import warnings
-from dataclasses import dataclass
-from dataclasses import is_dataclass
-from typing import Any
-from typing import Generic
-from typing import TypeVar
+from dataclasses import dataclass, is_dataclass
+from typing import Any, Generic, TypeVar
 
-from mitmproxy import flow
-from mitmproxy.connection import Connection
-from mitmproxy.proxy import commands
+from seleniumwire.thirdparty.mitmproxy import flow
+from seleniumwire.thirdparty.mitmproxy.connection import Connection
+from seleniumwire.thirdparty.mitmproxy.proxy import commands
 
 
 class Event:

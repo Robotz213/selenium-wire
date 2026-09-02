@@ -1,18 +1,15 @@
 from collections import defaultdict
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 
 import pylsqpack
-from aioquic.buffer import Buffer
-from aioquic.buffer import BufferReadError
-from aioquic.h3.connection import parse_settings
-from aioquic.h3.connection import Setting
+from aioquic.buffer import Buffer, BufferReadError
+from aioquic.h3.connection import Setting, parse_settings
+from mitmproxy_rs.contentviews import hex_dump
+
+from seleniumwire.thirdparty.mitmproxy import tcp
+from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
 
 from ..proxy.layers.http import is_h3_alpn
-from mitmproxy import tcp
-from mitmproxy.contentviews._api import Contentview
-from mitmproxy.contentviews._api import Metadata
-from mitmproxy_rs.contentviews import hex_dump
 
 
 @dataclass(frozen=True)
@@ -29,7 +26,7 @@ class Frame:
         elif self.type == 1:
             try:
                 hdrs = pylsqpack.Decoder(4096, 16).feed_header(0, self.data)[1]
-                return f"HEADERS Frame\n" + "\n".join(
+                return "HEADERS Frame\n" + "\n".join(
                     f"{k.decode(errors='backslashreplace')}: {v.decode(errors='backslashreplace')}"
                     for k, v in hdrs
                 )

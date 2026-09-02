@@ -12,8 +12,8 @@ from contextlib import redirect_stdout
 
 from OpenSSL import SSL
 
-from mitmproxy import version
-from mitmproxy.utils import asyncio_utils
+from seleniumwire.thirdparty.mitmproxy import version
+from seleniumwire.thirdparty.mitmproxy.utils import asyncio_utils
 
 
 def dump_system_info():

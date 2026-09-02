@@ -2,9 +2,9 @@ import asyncio
 import logging
 import sys
 
-from mitmproxy import log
-from mitmproxy.contrib import click as miniclick
-from mitmproxy.utils import vt_codes
+from seleniumwire.thirdparty.mitmproxy import log
+from seleniumwire.thirdparty.mitmproxy.contrib import click as miniclick
+from seleniumwire.thirdparty.mitmproxy.utils import vt_codes
 
 
 class ErrorCheck:

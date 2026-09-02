@@ -4,7 +4,7 @@ Utility decorators that help build state machines
 
 import functools
 
-from mitmproxy.proxy import events
+from seleniumwire.thirdparty.mitmproxy.proxy import events
 
 
 def expect(*event_types):

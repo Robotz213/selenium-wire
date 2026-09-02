@@ -20,37 +20,40 @@ from __future__ import annotations
 import logging
 import re
 import sys
-from collections.abc import Iterable
-from collections.abc import Sequence
-from typing import Any
-from typing import cast
+from collections.abc import Iterable, Sequence
+from typing import Any, cast
 
-from mitmproxy import ctx
-from mitmproxy.connection import Address
-from mitmproxy.net.tls import starts_like_dtls_record
-from mitmproxy.net.tls import starts_like_tls_record
-from mitmproxy.proxy import layer
-from mitmproxy.proxy import layers
-from mitmproxy.proxy import mode_specs
-from mitmproxy.proxy import tunnel
-from mitmproxy.proxy.context import Context
-from mitmproxy.proxy.layer import Layer
-from mitmproxy.proxy.layers import ClientQuicLayer
-from mitmproxy.proxy.layers import ClientTLSLayer
-from mitmproxy.proxy.layers import DNSLayer
-from mitmproxy.proxy.layers import HttpLayer
-from mitmproxy.proxy.layers import modes
-from mitmproxy.proxy.layers import RawQuicLayer
-from mitmproxy.proxy.layers import ServerQuicLayer
-from mitmproxy.proxy.layers import ServerTLSLayer
-from mitmproxy.proxy.layers import TCPLayer
-from mitmproxy.proxy.layers import UDPLayer
-from mitmproxy.proxy.layers.http import HTTPMode
-from mitmproxy.proxy.layers.quic import quic_parse_client_hello_from_datagrams
-from mitmproxy.proxy.layers.tls import dtls_parse_client_hello
-from mitmproxy.proxy.layers.tls import HTTP_ALPNS
-from mitmproxy.proxy.layers.tls import parse_client_hello
-from mitmproxy.tls import ClientHello
+from seleniumwire.thirdparty.mitmproxy import ctx
+from seleniumwire.thirdparty.mitmproxy.connection import Address
+from seleniumwire.thirdparty.mitmproxy.net.tls import (
+    starts_like_dtls_record,
+    starts_like_tls_record,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy import layer, layers, mode_specs, tunnel
+from seleniumwire.thirdparty.mitmproxy.proxy.context import Context
+from seleniumwire.thirdparty.mitmproxy.proxy.layer import Layer
+from seleniumwire.thirdparty.mitmproxy.proxy.layers import (
+    ClientQuicLayer,
+    ClientTLSLayer,
+    DNSLayer,
+    HttpLayer,
+    RawQuicLayer,
+    ServerQuicLayer,
+    ServerTLSLayer,
+    TCPLayer,
+    UDPLayer,
+    modes,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.http import HTTPMode
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.quic import (
+    quic_parse_client_hello_from_datagrams,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.tls import (
+    HTTP_ALPNS,
+    dtls_parse_client_hello,
+    parse_client_hello,
+)
+from seleniumwire.thirdparty.mitmproxy.tls import ClientHello
 
 if sys.version_info < (3, 11):
     from typing_extensions import assert_never

@@ -3,37 +3,34 @@ from collections.abc import Callable
 from typing import Union
 
 import h11
-from h11._readers import ChunkedReader
-from h11._readers import ContentLengthReader
-from h11._readers import Http10Reader
+from h11._readers import ChunkedReader, ContentLengthReader, Http10Reader
 from h11._receivebuffer import ReceiveBuffer
 
+from seleniumwire.thirdparty.mitmproxy import http, version
+from seleniumwire.thirdparty.mitmproxy.connection import Connection, ConnectionState
+from seleniumwire.thirdparty.mitmproxy.net.http import http1, status_codes
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, events, layer
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.http._base import (
+    ReceiveHttp,
+    StreamId,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.utils import expect
+from seleniumwire.thirdparty.mitmproxy.utils import human
+
 from ...context import Context
-from ._base import format_error
-from ._base import HttpConnection
-from ._events import ErrorCode
-from ._events import HttpEvent
-from ._events import RequestData
-from ._events import RequestEndOfMessage
-from ._events import RequestHeaders
-from ._events import RequestProtocolError
-from ._events import ResponseData
-from ._events import ResponseEndOfMessage
-from ._events import ResponseHeaders
-from ._events import ResponseProtocolError
-from mitmproxy import http
-from mitmproxy import version
-from mitmproxy.connection import Connection
-from mitmproxy.connection import ConnectionState
-from mitmproxy.net.http import http1
-from mitmproxy.net.http import status_codes
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy.layers.http._base import ReceiveHttp
-from mitmproxy.proxy.layers.http._base import StreamId
-from mitmproxy.proxy.utils import expect
-from mitmproxy.utils import human
+from ._base import HttpConnection, format_error
+from ._events import (
+    ErrorCode,
+    HttpEvent,
+    RequestData,
+    RequestEndOfMessage,
+    RequestHeaders,
+    RequestProtocolError,
+    ResponseData,
+    ResponseEndOfMessage,
+    ResponseHeaders,
+    ResponseProtocolError,
+)
 
 TBodyReader = Union[ChunkedReader, Http10Reader, ContentLengthReader]
 
@@ -115,7 +112,7 @@ class Http1Connection(HttpConnection, metaclass=abc.ABCMeta):
             elif isinstance(h11_event, h11.EndOfMessage):
                 assert self.request
                 if h11_event.headers:
-                    raise NotImplementedError(f"HTTP trailers are not implemented yet.")
+                    raise NotImplementedError("HTTP trailers are not implemented yet.")
                 if self.request.data.method.upper() != b"CONNECT":
                     yield ReceiveHttp(self.ReceiveEndOfMessage(self.stream_id))
                 is_request = isinstance(self, Http1Server)
@@ -139,7 +136,7 @@ class Http1Connection(HttpConnection, metaclass=abc.ABCMeta):
             yield ReceiveHttp(
                 self.ReceiveProtocolError(
                     self.stream_id,
-                    f"Client disconnected.",
+                    "Client disconnected.",
                     code=ErrorCode.CLIENT_DISCONNECTED,
                 )
             )
@@ -463,9 +460,11 @@ class Http1Client(Http1Connection):
 
 
 def should_make_pipe(request: http.Request, response: http.Response) -> bool:
-    if response.status_code == 101:
-        return True
-    elif response.status_code == 200 and request.method.upper() == "CONNECT":
+    if (
+        response.status_code == 101
+        or response.status_code == 200
+        and request.method.upper() == "CONNECT"
+    ):
         return True
     else:
         return False

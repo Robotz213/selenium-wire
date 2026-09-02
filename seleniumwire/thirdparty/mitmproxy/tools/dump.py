@@ -1,10 +1,10 @@
-from mitmproxy import addons
-from mitmproxy import master
-from mitmproxy import options
-from mitmproxy.addons import dumper
-from mitmproxy.addons import errorcheck
-from mitmproxy.addons import keepserving
-from mitmproxy.addons import readfile
+from seleniumwire.thirdparty.mitmproxy import addons, master, options
+from seleniumwire.thirdparty.mitmproxy.addons import (
+    dumper,
+    errorcheck,
+    keepserving,
+    readfile,
+)
 
 
 class DumpMaster(master.Master):

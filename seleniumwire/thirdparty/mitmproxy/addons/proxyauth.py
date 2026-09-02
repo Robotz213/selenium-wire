@@ -3,21 +3,17 @@ from __future__ import annotations
 import binascii
 import pathlib
 import weakref
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import MutableMapping
 from typing import Optional
 
 import ldap3
 
-from mitmproxy import connection
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy import http
-from mitmproxy.net.http import status_codes
-from mitmproxy.proxy import mode_specs
-from mitmproxy.proxy.layers import modes
-from mitmproxy.utils import htpasswd
+from seleniumwire.thirdparty.mitmproxy import connection, ctx, exceptions, http
+from seleniumwire.thirdparty.mitmproxy.net.http import status_codes
+from seleniumwire.thirdparty.mitmproxy.proxy import mode_specs
+from seleniumwire.thirdparty.mitmproxy.proxy.layers import modes
+from seleniumwire.thirdparty.mitmproxy.utils import htpasswd
 
 REALM = "mitmproxy"
 

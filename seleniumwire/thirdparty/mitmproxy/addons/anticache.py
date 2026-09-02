@@ -1,4 +1,4 @@
-from mitmproxy import ctx
+from seleniumwire.thirdparty.mitmproxy import ctx
 
 
 class AntiCache:

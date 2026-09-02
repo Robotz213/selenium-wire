@@ -1,8 +1,8 @@
 import re
 
-from mitmproxy import ctx
-from mitmproxy.http import HTTPFlow
-from mitmproxy.proxy import mode_specs
+from seleniumwire.thirdparty.mitmproxy import ctx
+from seleniumwire.thirdparty.mitmproxy.http import HTTPFlow
+from seleniumwire.thirdparty.mitmproxy.proxy import mode_specs
 
 ALT_SVC = "alt-svc"
 HOST_PATTERN = r"([a-zA-Z0-9.-]*:\d{1,5})"

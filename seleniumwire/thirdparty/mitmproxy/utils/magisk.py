@@ -5,9 +5,8 @@ from zipfile import ZipFile
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 
-from mitmproxy import certs
-from mitmproxy import ctx
-from mitmproxy.options import CONF_BASENAME
+from seleniumwire.thirdparty.mitmproxy import certs, ctx
+from seleniumwire.thirdparty.mitmproxy.options import CONF_BASENAME
 
 # The following 3 variables are for including in the magisk module as text file
 MODULE_PROP_TEXT = """id=mitmproxycert

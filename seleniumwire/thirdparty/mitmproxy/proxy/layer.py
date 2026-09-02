@@ -5,21 +5,15 @@ Base class for protocol layers.
 import collections
 import textwrap
 from abc import abstractmethod
-from collections.abc import Callable
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from dataclasses import dataclass
 from logging import DEBUG
-from typing import Any
-from typing import ClassVar
-from typing import NamedTuple
-from typing import TypeVar
+from typing import Any, ClassVar, NamedTuple, TypeVar
 
-from mitmproxy.connection import Connection
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import events
-from mitmproxy.proxy.commands import Command
-from mitmproxy.proxy.commands import StartHook
-from mitmproxy.proxy.context import Context
+from seleniumwire.thirdparty.mitmproxy.connection import Connection
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, events
+from seleniumwire.thirdparty.mitmproxy.proxy.commands import Command, StartHook
+from seleniumwire.thirdparty.mitmproxy.proxy.context import Context
 
 T = TypeVar("T")
 CommandGenerator = Generator[Command, Any, T]

@@ -4,36 +4,28 @@ import os
 import time
 import urllib.parse
 import warnings
-from collections.abc import Callable
-from collections.abc import Iterable
-from collections.abc import Iterator
-from collections.abc import Mapping
-from collections.abc import Sequence
-from dataclasses import dataclass
-from dataclasses import fields
-from email.utils import formatdate
-from email.utils import mktime_tz
-from email.utils import parsedate_tz
-from typing import Any
-from typing import cast
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from dataclasses import dataclass, fields
+from email.utils import formatdate, mktime_tz, parsedate_tz
+from typing import Any, cast
 
-from mitmproxy import flow
-from mitmproxy.coretypes import multidict
-from mitmproxy.coretypes import serializable
-from mitmproxy.net import encoding
-from mitmproxy.net.http import cookies
-from mitmproxy.net.http import multipart
-from mitmproxy.net.http import status_codes
-from mitmproxy.net.http import url
-from mitmproxy.net.http.headers import assemble_content_type
-from mitmproxy.net.http.headers import infer_content_encoding
-from mitmproxy.net.http.headers import parse_content_type
-from mitmproxy.utils import human
-from mitmproxy.utils import strutils
-from mitmproxy.utils import typecheck
-from mitmproxy.utils.strutils import always_bytes
-from mitmproxy.utils.strutils import always_str
-from mitmproxy.websocket import WebSocketData
+from seleniumwire.thirdparty.mitmproxy import flow
+from seleniumwire.thirdparty.mitmproxy.coretypes import multidict, serializable
+from seleniumwire.thirdparty.mitmproxy.net import encoding
+from seleniumwire.thirdparty.mitmproxy.net.http import (
+    cookies,
+    multipart,
+    status_codes,
+    url,
+)
+from seleniumwire.thirdparty.mitmproxy.net.http.headers import (
+    assemble_content_type,
+    infer_content_encoding,
+    parse_content_type,
+)
+from seleniumwire.thirdparty.mitmproxy.utils import human, strutils, typecheck
+from seleniumwire.thirdparty.mitmproxy.utils.strutils import always_bytes, always_str
+from seleniumwire.thirdparty.mitmproxy.websocket import WebSocketData
 
 
 # While headers _should_ be ASCII, it's not uncommon for certain headers to be utf-8 encoded.
@@ -607,9 +599,7 @@ class Request(Message):
             headers = Headers(headers)  # type: ignore
         else:
             raise TypeError(
-                "Expected headers to be an iterable or dict, but is {}.".format(
-                    type(headers).__name__
-                )
+                f"Expected headers to be an iterable or dict, but is {type(headers).__name__}."
             )
 
         req = cls(
@@ -925,7 +915,7 @@ class Request(Message):
         if accept_encoding:
             self.headers["accept-encoding"] = ", ".join(
                 e
-                for e in {"gzip", "identity", "deflate", "br", "zstd"}
+                for e in ("gzip", "identity", "deflate", "br", "zstd")
                 if e in accept_encoding
             )
 
@@ -1087,9 +1077,7 @@ class Response(Message):
             headers = Headers(headers)  # type: ignore
         else:
             raise TypeError(
-                "Expected headers to be an iterable or dict, but is {}.".format(
-                    type(headers).__name__
-                )
+                f"Expected headers to be an iterable or dict, but is {type(headers).__name__}."
             )
 
         resp = cls(
@@ -1288,8 +1276,8 @@ class HTTPFlow(flow.Flow):
 
 __all__ = [
     "HTTPFlow",
+    "Headers",
     "Message",
     "Request",
     "Response",
-    "Headers",
 ]

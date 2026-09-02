@@ -7,27 +7,36 @@ from __future__ import annotations
 
 import time
 
-from aioquic.quic.connection import QuicErrorCode
-from aioquic.quic.connection import stream_is_client_initiated
-from aioquic.quic.connection import stream_is_unidirectional
+from aioquic.quic.connection import (
+    QuicErrorCode,
+    stream_is_client_initiated,
+    stream_is_unidirectional,
+)
 
-from ._commands import CloseQuicConnection
-from ._commands import ResetQuicStream
-from ._commands import SendQuicStreamData
-from ._commands import StopSendingQuicStream
-from ._events import QuicConnectionClosed
-from ._events import QuicStreamDataReceived
-from ._events import QuicStreamEvent
-from ._events import QuicStreamReset
-from mitmproxy import connection
-from mitmproxy.connection import Connection
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import context
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy import tunnel
-from mitmproxy.proxy.layers.tcp import TCPLayer
-from mitmproxy.proxy.layers.udp import UDPLayer
+from seleniumwire.thirdparty.mitmproxy import connection
+from seleniumwire.thirdparty.mitmproxy.connection import Connection
+from seleniumwire.thirdparty.mitmproxy.proxy import (
+    commands,
+    context,
+    events,
+    layer,
+    tunnel,
+)
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.tcp import TCPLayer
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.udp import UDPLayer
+
+from ._commands import (
+    CloseQuicConnection,
+    ResetQuicStream,
+    SendQuicStreamData,
+    StopSendingQuicStream,
+)
+from ._events import (
+    QuicConnectionClosed,
+    QuicStreamDataReceived,
+    QuicStreamEvent,
+    QuicStreamReset,
+)
 
 
 class QuicStreamNextLayer(layer.NextLayer):

@@ -5,8 +5,7 @@ import urllib.parse
 import asgiref.compatibility
 import asgiref.wsgi
 
-from mitmproxy import ctx
-from mitmproxy import http
+from seleniumwire.thirdparty.mitmproxy import ctx, http
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +135,7 @@ async def serve(app, flow: http.HTTPFlow):
     try:
         await app(scope, receive, send)
         if not sent_response:
-            raise RuntimeError(f"no response sent.")
+            raise RuntimeError("no response sent.")
     except Exception as e:
         logger.exception(f"Error in asgi app: {e}")
         flow.response = http.Response.make(500, b"ASGI Error.")

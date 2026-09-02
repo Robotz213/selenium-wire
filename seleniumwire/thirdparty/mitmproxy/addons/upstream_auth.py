@@ -2,11 +2,9 @@ import base64
 import re
 from typing import Optional
 
-from mitmproxy import ctx
-from mitmproxy import exceptions
-from mitmproxy import http
-from mitmproxy.proxy import mode_specs
-from mitmproxy.utils import strutils
+from seleniumwire.thirdparty.mitmproxy import ctx, exceptions, http
+from seleniumwire.thirdparty.mitmproxy.proxy import mode_specs
+from seleniumwire.thirdparty.mitmproxy.utils import strutils
 
 
 def parse_upstream_auth(auth: str) -> bytes:

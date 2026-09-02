@@ -8,24 +8,17 @@ import warnings
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
-from typing import NewType
-from typing import Optional
-from typing import Union
+from typing import NewType, Union, cast
 
 import OpenSSL
 from cryptography import x509
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import dsa
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa
 from cryptography.hazmat.primitives.asymmetric.types import CertificatePublicKeyTypes
 from cryptography.hazmat.primitives.serialization import pkcs12
-from cryptography.x509 import ExtendedKeyUsageOID
-from cryptography.x509 import NameOID
+from cryptography.x509 import ExtendedKeyUsageOID, NameOID
 
-from mitmproxy.coretypes import serializable
+from seleniumwire.thirdparty.mitmproxy.coretypes import serializable
 
 if sys.version_info < (3, 13):  # pragma: no cover
     from typing_extensions import deprecated
@@ -437,7 +430,7 @@ class CertStoreEntry:
 
 
 TCustomCertId = str  # manually provided certs (e.g. mitmproxy's --certs)
-TGeneratedCertId = tuple[Optional[str], x509.GeneralNames]  # (common_name, sans)
+TGeneratedCertId = tuple[str | None, x509.GeneralNames]  # (common_name, sans)
 TCertId = Union[TCustomCertId, TGeneratedCertId]
 
 DHParams = NewType("DHParams", bytes)

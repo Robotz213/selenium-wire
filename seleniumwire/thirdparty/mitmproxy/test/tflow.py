@@ -3,19 +3,18 @@ import uuid
 
 from wsproto.frame_protocol import Opcode
 
-from mitmproxy import connection
-from mitmproxy import dns
-from mitmproxy import flow
-from mitmproxy import http
-from mitmproxy import tcp
-from mitmproxy import udp
-from mitmproxy import websocket
-from mitmproxy.connection import ConnectionState
-from mitmproxy.proxy.mode_specs import ProxyMode
-from mitmproxy.test.tutils import tdnsreq
-from mitmproxy.test.tutils import tdnsresp
-from mitmproxy.test.tutils import treq
-from mitmproxy.test.tutils import tresp
+from seleniumwire.thirdparty.mitmproxy import (
+    connection,
+    dns,
+    flow,
+    http,
+    tcp,
+    udp,
+    websocket,
+)
+from seleniumwire.thirdparty.mitmproxy.connection import ConnectionState
+from seleniumwire.thirdparty.mitmproxy.proxy.mode_specs import ProxyMode
+from seleniumwire.thirdparty.mitmproxy.test.tutils import tdnsreq, tdnsresp, treq, tresp
 
 
 def ttcpflow(

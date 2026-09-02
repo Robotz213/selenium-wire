@@ -3,20 +3,19 @@ This module is reponsible for drawing the quick key help at the bottom of mitmpr
 """
 
 from dataclasses import dataclass
-from typing import Union
 
 import urwid
 
-from mitmproxy import flow
-from mitmproxy.http import HTTPFlow
-from mitmproxy.tools.console.eventlog import EventLog
-from mitmproxy.tools.console.flowlist import FlowListBox
-from mitmproxy.tools.console.flowview import FlowView
-from mitmproxy.tools.console.grideditor.base import FocusEditor
-from mitmproxy.tools.console.help import HelpView
-from mitmproxy.tools.console.keybindings import KeyBindings
-from mitmproxy.tools.console.keymap import Keymap
-from mitmproxy.tools.console.options import Options
+from seleniumwire.thirdparty.mitmproxy import flow
+from seleniumwire.thirdparty.mitmproxy.http import HTTPFlow
+from seleniumwire.thirdparty.mitmproxy.tools.console.eventlog import EventLog
+from seleniumwire.thirdparty.mitmproxy.tools.console.flowlist import FlowListBox
+from seleniumwire.thirdparty.mitmproxy.tools.console.flowview import FlowView
+from seleniumwire.thirdparty.mitmproxy.tools.console.grideditor.base import FocusEditor
+from seleniumwire.thirdparty.mitmproxy.tools.console.help import HelpView
+from seleniumwire.thirdparty.mitmproxy.tools.console.keybindings import KeyBindings
+from seleniumwire.thirdparty.mitmproxy.tools.console.keymap import Keymap
+from seleniumwire.thirdparty.mitmproxy.tools.console.options import Options
 
 
 @dataclass
@@ -26,7 +25,7 @@ class BasicKeyHelp:
     key: str
 
 
-HelpItems = dict[str, Union[str, BasicKeyHelp]]
+HelpItems = dict[str, str | BasicKeyHelp]
 """
 A mapping from the short text that should be displayed in the help bar to the full help text provided for the key
 binding. The order of the items in the dictionary determines the order in which they are displayed in the help bar.
@@ -124,7 +123,7 @@ def make(
             "Clear": "Clear",
         }
     elif issubclass(widget, FocusEditor):
-        top_label = f"Edit:"
+        top_label = "Edit:"
         top_items |= {
             "Start edit": BasicKeyHelp("⏎"),
             "Stop edit": BasicKeyHelp("esc"),

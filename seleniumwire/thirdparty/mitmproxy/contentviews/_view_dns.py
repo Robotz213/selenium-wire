@@ -1,9 +1,10 @@
-from mitmproxy.contentviews._api import InteractiveContentview
-from mitmproxy.contentviews._api import Metadata
-from mitmproxy.contentviews._utils import yaml_dumps
-from mitmproxy.contentviews._utils import yaml_loads
-from mitmproxy.dns import DNSMessage as DNSMessage
-from mitmproxy.proxy.layers.dns import pack_message
+from seleniumwire.thirdparty.mitmproxy.contentviews._api import (
+    InteractiveContentview,
+    Metadata,
+)
+from seleniumwire.thirdparty.mitmproxy.contentviews._utils import yaml_dumps, yaml_loads
+from seleniumwire.thirdparty.mitmproxy.dns import DNSMessage as DNSMessage
+from seleniumwire.thirdparty.mitmproxy.proxy.layers.dns import pack_message
 
 
 def _is_dns_tcp(metadata: Metadata) -> bool:

@@ -1,6 +1,6 @@
-from mitmproxy import ctx
-from mitmproxy.addons import asgiapp
-from mitmproxy.addons.onboardingapp import app
+from seleniumwire.thirdparty.mitmproxy import ctx
+from seleniumwire.thirdparty.mitmproxy.addons import asgiapp
+from seleniumwire.thirdparty.mitmproxy.addons.onboardingapp import app
 
 APP_HOST = "mitm.it"
 

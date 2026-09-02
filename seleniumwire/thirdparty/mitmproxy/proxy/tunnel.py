@@ -1,14 +1,10 @@
 import time
-from enum import auto
-from enum import Enum
+from enum import Enum, auto
 from typing import Union
 
-from mitmproxy import connection
-from mitmproxy.proxy import commands
-from mitmproxy.proxy import context
-from mitmproxy.proxy import events
-from mitmproxy.proxy import layer
-from mitmproxy.proxy.layer import Layer
+from seleniumwire.thirdparty.mitmproxy import connection
+from seleniumwire.thirdparty.mitmproxy.proxy import commands, context, events, layer
+from seleniumwire.thirdparty.mitmproxy.proxy.layer import Layer
 
 
 class TunnelState(Enum):

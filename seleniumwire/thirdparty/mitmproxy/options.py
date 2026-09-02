@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import Optional
 
-from mitmproxy import optmanager
+from seleniumwire.thirdparty.mitmproxy import optmanager
 
 CONF_DIR = "~/.mitmproxy"
 CONF_BASENAME = "mitmproxy"

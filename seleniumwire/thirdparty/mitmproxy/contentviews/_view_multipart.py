@@ -1,9 +1,7 @@
-from ._utils import byte_pairs_to_str_pairs
-from ._utils import merge_repeated_keys
-from ._utils import yaml_dumps
-from mitmproxy.contentviews._api import Contentview
-from mitmproxy.contentviews._api import Metadata
-from mitmproxy.net.http.multipart import decode_multipart
+from seleniumwire.thirdparty.mitmproxy.contentviews._api import Contentview, Metadata
+from seleniumwire.thirdparty.mitmproxy.net.http.multipart import decode_multipart
+
+from ._utils import byte_pairs_to_str_pairs, merge_repeated_keys, yaml_dumps
 
 
 class MultipartContentview(Contentview):

@@ -1,14 +1,7 @@
-from __future__ import annotations
+import seleniumwire.thirdparty.mitmproxy.log
+import seleniumwire.thirdparty.mitmproxy.master
+import seleniumwire.thirdparty.mitmproxy.options
 
-import typing
-
-if typing.TYPE_CHECKING:
-    import mitmproxy.log
-    import mitmproxy.master
-    import mitmproxy.options
-
-master: mitmproxy.master.Master
-options: mitmproxy.options.Options
-
-log: mitmproxy.log.Log
-"""Deprecated: Use Python's builtin `logging` module instead."""
+log: "seleniumwire.thirdparty.mitmproxy.log.Log"
+master: "seleniumwire.thirdparty.mitmproxy.master.Master"
+options: "seleniumwire.thirdparty.mitmproxy.options.Options"

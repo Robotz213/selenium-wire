@@ -1,12 +1,11 @@
+from seleniumwire.thirdparty.mitmproxy import exceptions
+
+
 def assemble_request(request):
     if request.data.content is None:
-        raise ValueError("Cannot assemble flow with missing content")
+        raise exceptions.HttpException("Cannot assemble flow with missing content")
     head = assemble_request_head(request)
-    body = b"".join(
-        assemble_body(
-            request.data.headers, [request.data.content], request.data.trailers
-        )
-    )
+    body = b"".join(assemble_body(request.data.headers, [request.data.content], request.data.trailers))
     return head + body
 
 
@@ -18,13 +17,9 @@ def assemble_request_head(request):
 
 def assemble_response(response):
     if response.data.content is None:
-        raise ValueError("Cannot assemble flow with missing content")
+        raise exceptions.HttpException("Cannot assemble flow with missing content")
     head = assemble_response_head(response)
-    body = b"".join(
-        assemble_body(
-            response.data.headers, [response.data.content], response.data.trailers
-        )
-    )
+    body = b"".join(assemble_body(response.data.headers, [response.data.content], response.data.trailers))
     return head + body
 
 
@@ -45,9 +40,7 @@ def assemble_body(headers, body_chunks, trailers):
             yield b"0\r\n\r\n"
     else:
         if trailers:
-            raise ValueError(
-                "Sending HTTP/1.1 trailer headers requires transfer-encoding: chunked"
-            )
+            raise exceptions.HttpException("Sending HTTP/1.1 trailer headers requires transfer-encoding: chunked")
         for chunk in body_chunks:
             yield chunk
 
@@ -55,13 +48,13 @@ def assemble_body(headers, body_chunks, trailers):
 def _assemble_request_line(request_data):
     """
     Args:
-        request_data (mitmproxy.net.http.request.RequestData)
+        request_data (seleniumwire.thirdparty.mitmproxy.net.http.request.RequestData)
     """
     if request_data.method.upper() == b"CONNECT":
         return b"%s %s %s" % (
             request_data.method,
             request_data.authority,
-            request_data.http_version,
+            request_data.http_version
         )
     elif request_data.authority:
         return b"%s %s://%s%s %s" % (
@@ -69,20 +62,20 @@ def _assemble_request_line(request_data):
             request_data.scheme,
             request_data.authority,
             request_data.path,
-            request_data.http_version,
+            request_data.http_version
         )
     else:
         return b"%s %s %s" % (
             request_data.method,
             request_data.path,
-            request_data.http_version,
+            request_data.http_version
         )
 
 
 def _assemble_request_headers(request_data):
     """
     Args:
-        request_data (mitmproxy.net.http.request.RequestData)
+        request_data (seleniumwire.thirdparty.mitmproxy.net.http.request.RequestData)
     """
     return bytes(request_data.headers)
 

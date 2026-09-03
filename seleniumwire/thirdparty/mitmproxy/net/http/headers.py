@@ -1,20 +1,167 @@
 import collections
-import re
+from typing import Dict, Optional, Tuple
+
+from seleniumwire.thirdparty.mitmproxy.coretypes import multidict
+from seleniumwire.thirdparty.mitmproxy.utils import strutils
 
 
-def parse_content_type(c: str) -> tuple[str, str, dict[str, str]] | None:
+# See also: http://lucumr.pocoo.org/2013/7/2/the-updated-guide-to-unicode/
+
+
+# While headers _should_ be ASCII, it's not uncommon for certain headers to be utf-8 encoded.
+def _native(x):
+    return x.decode("utf-8", "surrogateescape")
+
+
+def _always_bytes(x):
+    return strutils.always_bytes(x, "utf-8", "surrogateescape")
+
+
+class Headers(multidict.MultiDict):
     """
-    A simple parser for content-type values. Returns a (type, subtype,
-    parameters) tuple, where type and subtype are strings, and parameters
-    is a dict. If the string could not be parsed, return None.
+    Header class which allows both convenient access to individual headers as well as
+    direct access to the underlying raw data. Provides a full dictionary interface.
 
-    E.g. the following string:
+    Example:
 
-        text/html; charset=UTF-8
+    .. code-block:: python
 
-    Returns:
+        # Create headers with keyword arguments
+        >>> h = Headers(host="example.com", content_type="application/xml")
 
-        ("text", "html", {"charset": "UTF-8"})
+        # Headers mostly behave like a normal dict.
+        >>> h["Host"]
+        "example.com"
+
+        # HTTP Headers are case insensitive
+        >>> h["host"]
+        "example.com"
+
+        # Headers can also be created from a list of raw (header_name, header_value) byte tuples
+        >>> h = Headers([
+            (b"Host",b"example.com"),
+            (b"Accept",b"text/html"),
+            (b"accept",b"application/xml")
+        ])
+
+        # Multiple headers are folded into a single header as per RFC7230
+        >>> h["Accept"]
+        "text/html, application/xml"
+
+        # Setting a header removes all existing headers with the same name.
+        >>> h["Accept"] = "application/text"
+        >>> h["Accept"]
+        "application/text"
+
+        # bytes(h) returns a HTTP1 header block.
+        >>> print(bytes(h))
+        Host: example.com
+        Accept: application/text
+
+        # For full control, the raw header fields can be accessed
+        >>> h.fields
+
+    Caveats:
+        For use with the "Set-Cookie" header, see :py:meth:`get_all`.
+    """
+
+    def __init__(self, fields=(), **headers):
+        """
+        Args:
+            fields: (optional) list of ``(name, value)`` header byte tuples,
+                e.g. ``[(b"Host", b"example.com")]``. All names and values must be bytes.
+            **headers: Additional headers to set. Will overwrite existing values from `fields`.
+                For convenience, underscores in header names will be transformed to dashes -
+                this behaviour does not extend to other methods.
+                If ``**headers`` contains multiple keys that have equal ``.lower()`` s,
+                the behavior is undefined.
+        """
+        super().__init__(fields)
+
+        for key, value in self.fields:
+            if not isinstance(key, bytes) or not isinstance(value, bytes):
+                raise TypeError("Header fields must be bytes.")
+
+        # content_type -> content-type
+        headers = {
+            _always_bytes(name).replace(b"_", b"-"): _always_bytes(value)
+            for name, value in headers.items()
+        }
+        self.update(headers)
+
+    @staticmethod
+    def _reduce_values(values):
+        # Headers can be folded
+        return ", ".join(values)
+
+    @staticmethod
+    def _kconv(key):
+        # Headers are case-insensitive
+        return key.lower()
+
+    def __bytes__(self):
+        if self.fields:
+            return b"\r\n".join(b": ".join(field) for field in self.fields) + b"\r\n"
+        else:
+            return b""
+
+    def __delitem__(self, key):
+        key = _always_bytes(key)
+        super().__delitem__(key)
+
+    def __iter__(self):
+        for x in super().__iter__():
+            yield _native(x)
+
+    def get_all(self, name):
+        """
+        Like :py:meth:`get`, but does not fold multiple headers into a single one.
+        This is useful for Set-Cookie headers, which do not support folding.
+        See also: https://tools.ietf.org/html/rfc7230#section-3.2.2
+        """
+        name = _always_bytes(name)
+        return [
+            _native(x) for x in
+            super().get_all(name)
+        ]
+
+    def set_all(self, name, values):
+        """
+        Explicitly set multiple headers for the given key.
+        See: :py:meth:`get_all`
+        """
+        name = _always_bytes(name)
+        values = [_always_bytes(x) for x in values]
+        return super().set_all(name, values)
+
+    def insert(self, index, key, value):
+        key = _always_bytes(key)
+        value = _always_bytes(value)
+        super().insert(index, key, value)
+
+    def items(self, multi=False):
+        if multi:
+            return (
+                (_native(k), _native(v))
+                for k, v in self.fields
+            )
+        else:
+            return super().items()
+
+
+def parse_content_type(c: str) -> Optional[Tuple[str, str, Dict[str, str]]]:
+    """
+        A simple parser for content-type values. Returns a (type, subtype,
+        parameters) tuple, where type and subtype are strings, and parameters
+        is a dict. If the string could not be parsed, return None.
+
+        E.g. the following string:
+
+            text/html; charset=UTF-8
+
+        Returns:
+
+            ("text", "html", {"charset": "UTF-8"})
     """
     parts = c.split(";", 1)
     ts = parts[0].split("/", 1)
@@ -31,83 +178,11 @@ def parse_content_type(c: str) -> tuple[str, str, dict[str, str]] | None:
 
 def assemble_content_type(type, subtype, parameters):
     if not parameters:
-        return f"{type}/{subtype}"
-    params = "; ".join(f"{k}={v}" for k, v in parameters.items())
-    return f"{type}/{subtype}; {params}"
-
-
-def infer_content_encoding(content_type: str, content: bytes = b"") -> str:
-    """
-    Infer the encoding of content from the content-type header.
-    """
-    enc = None
-
-    # BOM has the highest priority
-    if content.startswith(b"\x00\x00\xfe\xff"):
-        enc = "utf-32be"
-    elif content.startswith(b"\xff\xfe\x00\x00"):
-        enc = "utf-32le"
-    elif content.startswith(b"\xfe\xff"):
-        enc = "utf-16be"
-    elif content.startswith(b"\xff\xfe"):
-        enc = "utf-16le"
-    elif content.startswith(b"\xef\xbb\xbf"):
-        # 'utf-8-sig' will strip the BOM on decode
-        enc = "utf-8-sig"
-    elif parsed_content_type := parse_content_type(content_type):
-        # Use the charset from the header if possible
-        enc = parsed_content_type[2].get("charset")
-
-    # Otherwise, infer the encoding
-    if not enc and "json" in content_type:
-        enc = "utf8"
-
-    if not enc and "html" in content_type:
-        meta_charset = re.search(
-            rb"""<meta[^>]+charset=['"]?([^'">]+)""", content, re.IGNORECASE
-        )
-        if meta_charset:
-            enc = meta_charset.group(1).decode("ascii", "ignore")
-        else:
-            # Fallback to utf8 for html
-            # Ref: https://html.spec.whatwg.org/multipage/parsing.html#determining-the-character-encoding
-            # > 9. [snip] the comprehensive UTF-8 encoding is suggested.
-            enc = "utf8"
-
-    if not enc and "xml" in content_type:
-        if xml_encoding := re.search(
-            rb"""<\?xml[^\?>]+encoding=['"]([^'"\?>]+)""", content, re.IGNORECASE
-        ):
-            enc = xml_encoding.group(1).decode("ascii", "ignore")
-        else:
-            # Fallback to utf8 for xml
-            # Ref: https://datatracker.ietf.org/doc/html/rfc7303#section-8.5
-            # > the XML processor [snip] to determine an encoding of UTF-8.
-            enc = "utf8"
-
-    if not enc and ("javascript" in content_type or "ecmascript" in content_type):
-        # Fallback to utf8 for javascript
-        # Ref: https://datatracker.ietf.org/doc/html/rfc9239#section-4.2
-        # > 3. Else, the character encoding scheme is assumed to be UTF-8
-        enc = "utf8"
-
-    if not enc and "text/css" in content_type:
-        # @charset rule must be the very first thing.
-        css_charset = re.match(rb"""@charset "([^"]+)";""", content, re.IGNORECASE)
-        if css_charset:
-            enc = css_charset.group(1).decode("ascii", "ignore")
-        else:
-            # Fallback to utf8 for css
-            # Ref: https://drafts.csswg.org/css-syntax/#determine-the-fallback-encoding
-            # > 4. Otherwise, return utf-8
-            enc = "utf8"
-
-    # Fallback to latin-1
-    if not enc:
-        enc = "latin-1"
-
-    # Use GB 18030 as the superset of GB2312 and GBK to fix common encoding problems on Chinese websites.
-    if enc.lower() in ("gb2312", "gbk"):
-        enc = "gb18030"
-
-    return enc
+        return "{}/{}".format(type, subtype)
+    params = "; ".join(
+        "{}={}".format(k, v)
+        for k, v in parameters.items()
+    )
+    return "{}/{}; {}".format(
+        type, subtype, params
+    )

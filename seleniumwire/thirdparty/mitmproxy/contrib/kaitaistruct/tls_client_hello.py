@@ -1,19 +1,19 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
-import array
-import struct
-import zlib
-from enum import Enum
 
 from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
 from kaitaistruct import __version__ as ks_version
+
 try:
     from packaging.version import Version
 except ImportError:
     from pkg_resources import parse_version as Version
 
-if Version(ks_version) < Version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+if Version(ks_version) < Version("0.7"):
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
+        % (ks_version)
+    )
 
 
 class TlsClientHello(KaitaiStruct):
@@ -25,7 +25,9 @@ class TlsClientHello(KaitaiStruct):
         self.random = self._root.Random(self._io, self, self._root)
         self.session_id = self._root.SessionId(self._io, self, self._root)
         self.cipher_suites = self._root.CipherSuites(self._io, self, self._root)
-        self.compression_methods = self._root.CompressionMethods(self._io, self, self._root)
+        self.compression_methods = self._root.CompressionMethods(
+            self._io, self, self._root
+        )
         if self._io.is_eof() == True:
             self.extensions = [None] * (0)
             for i in range(0):
@@ -67,7 +69,9 @@ class TlsClientHello(KaitaiStruct):
             self.list_length = self._io.read_u2be()
             self.server_names = []
             while not self._io.is_eof():
-                self.server_names.append(self._root.ServerName(self._io, self, self._root))
+                self.server_names.append(
+                    self._root.ServerName(self._io, self, self._root)
+                )
 
     class CipherSuites(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -95,7 +99,9 @@ class TlsClientHello(KaitaiStruct):
             self.ext_len = self._io.read_u2be()
             self.alpn_protocols = []
             while not self._io.is_eof():
-                self.alpn_protocols.append(self._root.Protocol(self._io, self, self._root))
+                self.alpn_protocols.append(
+                    self._root.Protocol(self._io, self, self._root)
+                )
 
     class Extensions(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):

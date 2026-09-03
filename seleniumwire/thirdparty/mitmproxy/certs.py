@@ -8,6 +8,8 @@ import time
 import typing
 
 import OpenSSL
+from cryptography import x509
+from cryptography.x509.oid import ExtensionOID
 from pyasn1.codec.der.decoder import decode
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import char, constraint, namedtype, tag, univ
@@ -458,17 +460,29 @@ class Cert(serializable.Serializable):
             All DNS altnames.
         """
         # tcp.TCPClient.convert_to_tls assumes that this property only contains DNS altnames for hostname verification.
-        altnames = []
-        for i in range(self.x509.get_extension_count()):
-            ext = self.x509.get_extension(i)
-            if ext.get_short_name() == b"subjectAltName":
-                try:
-                    dec = decode(ext.get_data(), asn1Spec=_GeneralNames())
-                except PyAsn1Error:
-                    continue
-                for i in dec[0]:
-                    if i[0].hasValue():
-                        e = i[0].asOctets()
-                        altnames.append(e)
+        if hasattr(self.x509, "get_extension"):
+            altnames = []
+            for i in range(self.x509.get_extension_count()):
+                ext = self.x509.get_extension(i)
+                if ext.get_short_name() == b"subjectAltName":
+                    try:
+                        dec = decode(ext.get_data(), asn1Spec=_GeneralNames())
+                    except PyAsn1Error:
+                        continue
+                    for name in dec[0]:
+                        if name[0].hasValue():
+                            altnames.append(name[0].asOctets())
+            return altnames
 
-        return altnames
+        try:
+            extension = self.x509.to_cryptography().extensions.get_extension_for_oid(
+                ExtensionOID.SUBJECT_ALTERNATIVE_NAME
+            )
+        except x509.ExtensionNotFound:
+            return []
+
+        return [
+            name.value.encode("idna")
+            for name in extension.value
+            if isinstance(name, x509.DNSName)
+        ]

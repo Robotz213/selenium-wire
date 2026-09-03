@@ -18,27 +18,79 @@ profile = "black"
 line_length = 119
 multi_line_output = 3
 
-[dependency-groups]
-dev = [
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "selenium-wire"
+version = "5.1.0"
+description = "Extends Selenium to give you the ability to inspect requests made by the browser."
+readme = { file = "README.rst", content-type = "text/x-rst" }
+requires-python = ">=3.6"
+license = { text = "MIT" }
+authors = [{ name = "Will Keeling", email = "will@zifferent.com" }]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+]
+keywords = ["selenium-wire"]
+dependencies = [
   "blinker>=1.4",
   "certifi>=2019.9.11",
-  "h2>=4.0; python_version>='3.6.0'",
-  "hyperframe>=6.0; python_version>='3.6.0'",
   "kaitaistruct>=0.7",
   "pyasn1>=0.3.1",
-  "cryptography==50.0.1",
-  "pyOpenSSL>=26.4.0",
   "pyparsing>=2.4.2",
   "pysocks>=1.7.1",
-  "selenium>=4.0.0",
   "wsproto>=0.14",
   "zstandard>=0.14.1",
-  "gitpython>=3.1.61",
-  "ruff>=0.16.5",
-  "pre-commit>=4.6.2",
-  "pyright>=1.1.411",
-  "mitmproxy-rs>=0.12.11",
+  "pydivert>=2.0.3; sys_platform == 'win32'",
+  "dataclasses>=0.7; python_version == '3.6'",
+  "pyopenssl>=23.2.0",
+  "selenium>=3.141.0",
+  "h2>=3.2.0",
+  "hyperframe>=5.2.0",
+  "cryptography>=40.0.2",
 ]
+
+[project.urls]
+Homepage = "https://github.com/wkeeling/selenium-wire"
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "bumpversion",
+  "coverage",
+  "flake8",
+  "gunicorn",
+  "httpbin",
+  "isort",
+  "mypy",
+  "pre-commit",
+  "pytest",
+  "pytest-cov",
+  "tox",
+  "twine",
+  "werkzeug==2.0.3",
+  "wheel",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["*.tests", "*.tests.*", "tests.*", "tests"]
 
 
 [tool.pyright]

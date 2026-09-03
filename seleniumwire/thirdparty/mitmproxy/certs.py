@@ -9,7 +9,10 @@ import typing
 
 import OpenSSL
 from cryptography import x509
-from cryptography.x509.oid import ExtensionOID
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.serialization import pkcs12
+from cryptography.x509.oid import ExtendedKeyUsageOID, ExtensionOID, NameOID
 from pyasn1.codec.der.decoder import decode
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import char, constraint, namedtype, tag, univ
@@ -19,6 +22,49 @@ from seleniumwire.thirdparty.mitmproxy.coretypes import serializable
 # Default expiry must not be too long: https://github.com/mitmproxy/mitmproxy/issues/815
 DEFAULT_EXP = 94608000  # = 60 * 60 * 24 * 365 * 3 = 3 years
 DEFAULT_EXP_DUMMY_CERT = 31536000  # = 60 * 60 * 24 * 365 = 1 year
+
+
+def _use_modern_x509_api():
+    return not hasattr(OpenSSL.crypto.X509, "add_extensions")
+
+
+def _as_text(value, encoding="utf-8"):
+    return value.decode(encoding) if isinstance(value, bytes) else value
+
+
+def _create_ca_modern(organization, cn, exp, key_size):
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=key_size)
+    subject = x509.Name(
+        [
+            x509.NameAttribute(NameOID.COMMON_NAME, _as_text(cn)),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, _as_text(organization)),
+        ]
+    )
+    now = datetime.datetime.now(datetime.timezone.utc)
+    certificate = (
+        x509.CertificateBuilder()
+        .subject_name(subject)
+        .issuer_name(subject)
+        .public_key(private_key.public_key())
+        .serial_number(int(time.time() * 10000))
+        .not_valid_before(now - datetime.timedelta(hours=48))
+        .not_valid_after(now + datetime.timedelta(seconds=exp))
+        .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
+        .add_extension(
+            x509.KeyUsage(False, False, False, False, False, True, True, False, False),
+            critical=True,
+        )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(private_key.public_key()),
+            critical=False,
+        )
+        .sign(private_key, hashes.SHA256())
+    )
+    return (
+        OpenSSL.crypto.PKey.from_cryptography_key(private_key),
+        OpenSSL.crypto.X509.from_cryptography(certificate),
+    )
+
 
 # Generated with "openssl dhparam". It's too slow to generate this on startup.
 DEFAULT_DHPARAM = b"""
@@ -39,6 +85,9 @@ rD693XKIHUCWOjMh1if6omGXKHH40QuME2gNa50+YPn1iYDl88uDbbMCAQI=
 
 
 def create_ca(organization, cn, exp, key_size):
+    if _use_modern_x509_api():
+        return _create_ca_modern(organization, cn, exp, key_size)
+
     key = OpenSSL.crypto.PKey()
     key.generate_key(OpenSSL.crypto.TYPE_RSA, key_size)
     cert = OpenSSL.crypto.X509()
@@ -69,7 +118,57 @@ def create_ca(organization, cn, exp, key_size):
     return key, cert
 
 
+def _dummy_cert_modern(privkey, cacert, commonname, sans, organization):
+    private_key = privkey.to_cryptography_key()
+    issuer = cacert.to_cryptography()
+    is_valid_commonname = commonname is not None and len(commonname) < 64
+    attributes = []
+    if is_valid_commonname:
+        attributes.append(
+            x509.NameAttribute(NameOID.COMMON_NAME, commonname.decode("idna"))
+        )
+    if organization is not None:
+        attributes.append(
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization.decode("utf-8"))
+        )
+    now = datetime.datetime.now(datetime.timezone.utc)
+    builder = (
+        x509.CertificateBuilder()
+        .subject_name(x509.Name(attributes))
+        .issuer_name(issuer.subject)
+        .public_key(private_key.public_key())
+        .serial_number(int(time.time() * 10000))
+        .not_valid_before(now - datetime.timedelta(hours=48))
+        .not_valid_after(now + datetime.timedelta(seconds=DEFAULT_EXP_DUMMY_CERT))
+        .add_extension(
+            x509.ExtendedKeyUsage(
+                [
+                    ExtendedKeyUsageOID.SERVER_AUTH,
+                    ExtendedKeyUsageOID.CLIENT_AUTH,
+                ]
+            ),
+            critical=False,
+        )
+    )
+    if sans:
+        names = []
+        for name in sans:
+            try:
+                names.append(x509.IPAddress(ipaddress.ip_address(name.decode("ascii"))))
+            except ValueError:
+                names.append(x509.DNSName(name.decode("idna")))
+        builder = builder.add_extension(
+            x509.SubjectAlternativeName(names),
+            critical=not is_valid_commonname,
+        )
+    certificate = builder.sign(private_key, hashes.SHA256())
+    return Cert(OpenSSL.crypto.X509.from_cryptography(certificate))
+
+
 def dummy_cert(privkey, cacert, commonname, sans, organization):
+    if _use_modern_x509_api():
+        return _dummy_cert_modern(privkey, cacert, commonname, sans, organization)
+
     """
     Generates a dummy certificate.
 
@@ -239,20 +338,33 @@ class CertStore:
             f.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, ca))
 
         # Dump the certificate in PKCS12 format for Windows devices
+        certificate = ca.to_cryptography()
+        private_key = key.to_cryptography_key()
         with open(os.path.join(path, basename + "-ca-cert.p12"), "wb") as f:
-            p12 = OpenSSL.crypto.PKCS12()
-            p12.set_certificate(ca)
-            f.write(p12.export())
+            f.write(
+                pkcs12.serialize_key_and_certificates(
+                    basename.encode(),
+                    None,
+                    certificate,
+                    None,
+                    serialization.NoEncryption(),
+                )
+            )
 
         # Dump the certificate and key in a PKCS12 format for Windows devices
         with (
             CertStore.umask_secret(),
             open(os.path.join(path, basename + "-ca.p12"), "wb") as f,
         ):
-            p12 = OpenSSL.crypto.PKCS12()
-            p12.set_certificate(ca)
-            p12.set_privatekey(key)
-            f.write(p12.export())
+            f.write(
+                pkcs12.serialize_key_and_certificates(
+                    basename.encode(),
+                    private_key,
+                    certificate,
+                    None,
+                    serialization.NoEncryption(),
+                )
+            )
 
         with open(os.path.join(path, basename + "-dhparam.pem"), "wb") as f:
             f.write(DEFAULT_DHPARAM)

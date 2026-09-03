@@ -1,12 +1,17 @@
 import contextlib
 import copy
 import functools
+import inspect
 import pprint
 import textwrap
 import typing
+import weakref
 
 import blinker
-import blinker._saferef
+try:
+    import blinker._saferef
+except ImportError:
+    blinker._saferef = None
 
 from seleniumwire.thirdparty.mitmproxy import exceptions
 from seleniumwire.thirdparty.mitmproxy.utils import typecheck
@@ -133,16 +138,21 @@ class OptManager:
             if i not in self._options:
                 raise exceptions.OptionsError("No such option: %s" % i)
 
-        # We reuse blinker's safe reference functionality to cope with weakrefs
-        # to bound methods.
-        func = blinker._saferef.safe_ref(func)
+        # Blinker removed its private _saferef module in version 1.8. Use the
+        # standard library equivalents when it is unavailable.
+        if blinker._saferef is not None:
+            reference = blinker._saferef.safe_ref(func)
+        elif inspect.ismethod(func):
+            reference = weakref.WeakMethod(func)
+        else:
+            reference = weakref.ref(func)
 
         @functools.wraps(func)
         def _call(options, updated):
             if updated.intersection(set(opts)):
-                f = func()
-                if f:
-                    f(options, updated)
+                callback = reference()
+                if callback:
+                    callback(options, updated)
                 else:
                     self.changed.disconnect(_call)
 

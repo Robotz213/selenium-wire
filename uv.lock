@@ -2284,12 +2284,14 @@ dependencies = [
     { name = "h2" },
     { name = "hyperframe" },
     { name = "kaitaistruct" },
+    { name = "packaging" },
     { name = "pyasn1" },
     { name = "pydivert", marker = "sys_platform == 'win32'" },
     { name = "pyopenssl" },
     { name = "pyparsing" },
     { name = "pysocks" },
     { name = "selenium" },
+    { name = "setuptools" },
     { name = "wsproto" },
     { name = "zstandard" },
 ]
@@ -2330,6 +2332,7 @@ requires-dist = [
     { name = "isort", marker = "extra == 'dev'" },
     { name = "kaitaistruct", specifier = ">=0.7" },
     { name = "mypy", marker = "extra == 'dev'" },
+    { name = "packaging", specifier = ">=26.3" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pyasn1", specifier = ">=0.6.5" },
     { name = "pydivert", marker = "sys_platform == 'win32'", specifier = ">=4.0.1" },
@@ -2339,6 +2342,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "selenium", specifier = ">=4.52.0" },
+    { name = "setuptools", specifier = ">=84.2.1" },
     { name = "tox", marker = "extra == 'dev'" },
     { name = "twine", marker = "extra == 'dev'" },
     { name = "werkzeug", marker = "extra == 'dev'", specifier = "==2.0.3" },
@@ -2347,6 +2351,15 @@ requires-dist = [
     { name = "zstandard", specifier = ">=0.14.1" },
 ]
 provides-extras = ["dev"]
+
+[[package]]
+name = "setuptools"
+version = "84.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/70/b3/c19426f783614d625699a4b247faf628ea9ab1db228674491767b417f9e1/setuptools-84.2.1.tar.gz", hash = "sha256:3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc", size = 1230289, upload-time = "2026-10-20T19:01:37.742Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/55/6dc6d6bb953bdfc52519a0059592c52b6e3b8ad51cf8256dffceb55b0610/setuptools-84.2.1-py3-none-any.whl", hash = "sha256:ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2", size = 876263, upload-time = "2026-10-20T19:01:35.678Z" },
+]
 
 [[package]]
 name = "six"

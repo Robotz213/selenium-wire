@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import collections.abc
 import contextlib
@@ -10,11 +12,14 @@ import re
 import socket
 import socketserver
 import threading
-import typing
+from collections.abc import Callable, Generator
+from typing import TYPE_CHECKING, ClassVar
 
 import pydivert
 import pydivert.consts
 
+if TYPE_CHECKING:
+    from _typeshed import Incomplete as Any
 REDIRECT_API_HOST = "127.0.0.1"
 REDIRECT_API_PORT = 8085
 
@@ -23,7 +28,7 @@ REDIRECT_API_PORT = 8085
 # Resolver
 
 
-def read(rfile: io.BufferedReader) -> typing.Any:
+def read(rfile: io.BufferedReader) -> Any:
     x = rfile.readline().strip()
     return json.loads(x)
 
@@ -273,7 +278,7 @@ class Redirect(threading.Thread):
 
     def __init__(
         self,
-        handle: typing.Callable[[pydivert.Packet], None],
+        handle: Callable[[pydivert.Packet], None],
         filter: str,
         layer: pydivert.Layer = pydivert.Layer.NETWORK,
         flags: pydivert.Flag = 0,
@@ -319,7 +324,7 @@ class RedirectLocal(Redirect):
     trusted_pids: set[int]
 
     def __init__(
-        self, redirect_request: typing.Callable[[pydivert.Packet], None], filter: str
+        self, redirect_request: Callable[[pydivert.Packet], None], filter: str
     ) -> None:
         self.tcp_connections = TcpConnectionTable()
         self.trusted_pids = set()
@@ -350,7 +355,7 @@ TConnection = tuple[str, int]
 class ClientServerMap:
     """A thread-safe LRU dict."""
 
-    connection_cache_size: typing.ClassVar[int] = 65536
+    connection_cache_size: ClassVar[int] = 65536
 
     def __init__(self):
         self._lock = threading.Lock()
@@ -411,7 +416,7 @@ class TransparentProxy:
 
     local: RedirectLocal | None = None
     # really weird linting error here.
-    forward: typing.Optional[Redirect] = None  # noqa
+    forward: Redirect | None = None
     response: Redirect
     icmp: Redirect
 
@@ -492,7 +497,7 @@ class TransparentProxy:
         self.icmp.shutdown()
         self.api.shutdown()
 
-    def redirect_request(self, packet: pydivert.Packet):
+    def redirect_request(self, packet: pydivert.Packet) -> None:
         # print(" * Redirect client -> server to mitmproxy")
         # print(f"{packet.src_addr}:{packet.src_port} -> {packet.dst_addr}:{packet.dst_port}")
         client = (packet.src_addr, packet.src_port)
@@ -517,7 +522,7 @@ class TransparentProxy:
         # so we use the response handle.
         self.response.windivert.send(packet)
 
-    def redirect_response(self, packet: pydivert.Packet):
+    def redirect_response(self, packet: pydivert.Packet) -> None:
         """
         If the mitmproxy responds to the client, let the client believe the target server sent the
         packets.
@@ -534,7 +539,7 @@ class TransparentProxy:
         self.response.windivert.send(packet, recalculate_checksum=False)
 
     @contextlib.contextmanager
-    def exempt(self, pid: int):
+    def exempt(self, pid: int) -> Generator[None, Any, None]:
         if self.local:
             self.local.trusted_pids.add(pid)
         try:

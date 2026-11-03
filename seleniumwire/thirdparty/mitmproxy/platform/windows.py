@@ -20,10 +20,10 @@ import pydivert.consts
 
 if TYPE_CHECKING:
     from _typeshed import Incomplete as Any
+
+
 REDIRECT_API_HOST = "127.0.0.1"
 REDIRECT_API_PORT = 8085
-
-
 ##########################
 # Resolver
 

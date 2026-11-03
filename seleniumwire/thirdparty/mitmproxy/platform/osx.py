@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 import subprocess
+from typing import TYPE_CHECKING
 
 from . import pf
 
+if TYPE_CHECKING:
+    from _typeshed import Incomplete as Any
 """
     Doing this the "right" way by using DIOCNATLOOK on the pf device turns out
     to be a pain. Apple has made a number of modifications to the data
@@ -17,7 +22,7 @@ from . import pf
 STATECMD = ("sudo", "-n", "/sbin/pfctl", "-s", "state")
 
 
-def original_addr(csock):
+def original_addr(csock) -> tuple[Any, int]:
     peer = csock.getpeername()
     try:
         stxt = subprocess.check_output(STATECMD, stderr=subprocess.STDOUT)
@@ -27,10 +32,13 @@ def original_addr(csock):
         else:
             raise RuntimeError("Error getting pfctl state: " + repr(e))
     else:
-        insufficient_priv = "sudo: a password is required" in stxt.decode(errors="replace")
+        insufficient_priv = "sudo: a password is required" in stxt.decode(
+            errors="replace"
+        )
 
     if insufficient_priv:
         raise RuntimeError(
             "Insufficient privileges to access pfctl. "
-            "See https://mitmproxy.org/docs/latest/howto-transparent/#macos for details.")
-    return pf.lookup(peer[0], peer[1], stxt)
+            "See https://mitmproxy.org/docs/latest/howto-transparent/#macos for details."
+        )
+    return pf.lookup(peer[0], peer[1], stxt)  # pyright: ignore[reportPossiblyUnboundVariable]
